@@ -6,16 +6,14 @@ Authors: Celio Boulay, Dylan Sparrow, Rafael Castro
 
 import Mathlib.Data.Set.Card
 import Mathlib.Data.Real.Archimedean
-import Mathlib.Data.Setoid.Partition
 import Mathlib.Combinatorics.Graph.Basic
 import Mathlib.LinearAlgebra.Matrix.Symmetric
-import Mathlib.LinearAlgebra.Matrix.Trace
-import Mathlib.LinearAlgebra.Matrix.Hadamard
 
 /-!
 # Expander Graphs
 
 TODO: write documentation :)
+Move things in different files (e.g. split multigraphs and expanders)
 
 ## References
 * [Irit Dinur. The PCP theorem by gap amplification. ECCC, 2005.][Dinur2005]
@@ -24,8 +22,9 @@ TODO: write documentation :)
 
 namespace ExpanderGraphs
 
-variable {α β V : Type*} [Fintype V] [DecidableEq α] [DecidableEq β]
+variable {α β V : Type*} [Fintype V]
 variable (G : Graph α β) [Fintype G.vertexSet] [Fintype G.edgeSet]
+variable [∀ v : α, Fintype (G.incidenceSet v)]
 
 /-- The Edge Boundary of a set S, denoted ∂S, is `∂S = E(S, Sᶜ)`.\
 This is the set of edges emanating from the set S to its complement. -/
@@ -63,6 +62,22 @@ noncomputable def adjMultiplicity (G : Graph α β) (u v : α) : ℕ :=
 /-- `adjMatrixMulti G` is the adjacency matrix the multigraph `G` -/
 noncomputable def adjMatrixMulti (G : Graph α β) : Matrix α α ℕ :=
   fun u v => adjMultiplicity G u v
+
+
+/-- `G.degree v` is the number of vertices adjacent to `v`. -/
+def degree (G : Graph α β) (v : α) [Fintype (G.incidenceSet v)] : ℕ :=
+  Fintype.card (G.incidenceSet v)
+
+
+/-- A locally finite graph is regular of degree `d` if every vertex has degree `d`. -/
+def IsRegularOfDegree (d : ℕ) [∀ v : α, Fintype (G.incidenceSet v)] : Prop :=
+  ∀ (v : α), v ∈ G.vertexSet → degree G v = d
+
+
+/-- Given a `d`-regular graph `G`, `d` is an eigenvalue of its adjacency matrix -/
+theorem degreeIsEigvalOfRegularGraph (d : ℕ) (hG : IsRegularOfDegree G d) :
+  1 = 2 :=
+  sorry
 
 
 end ExpanderGraphs
