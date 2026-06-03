@@ -8,6 +8,7 @@ import Mathlib.Data.Set.Card
 import Mathlib.Data.Real.Archimedean
 import Mathlib.Combinatorics.Graph.Basic
 import Mathlib.LinearAlgebra.Matrix.Symmetric
+import Mathlib.Analysis.Matrix.Spectrum
 
 /-!
 # Expander Graphs
@@ -22,9 +23,12 @@ Move things in different files (e.g. split multigraphs and expanders)
 
 namespace ExpanderGraphs
 
-variable {α β V : Type*} [Fintype V]
-variable (G : Graph α β) [Fintype G.vertexSet] [Fintype G.edgeSet]
-variable [∀ v : α, Fintype (G.incidenceSet v)]
+variable {α β : Type*} [Fintype α] [DecidableEq α] [OfNat α 0] [OfNat α 1]
+variable (G : Graph α β)
+variable [CommSemiring α] [Ring α] [Algebra ℝ α]
+variable [locally_finite : ∀ v : α, Fintype (G.incidenceSet v)]
+
+open Matrix
 
 /-- The Edge Boundary of a set S, denoted ∂S, is `∂S = E(S, Sᶜ)`.\
 This is the set of edges emanating from the set S to its complement. -/
@@ -49,8 +53,8 @@ def expanderFamily (g : ℕ → Graph α β) (ε : ℝ) : Prop :=
 
 /-- `A : Matrix α α ℕ` is qualified as the adjacency
 matrix of a multigraph if `A` is symmetric. -/
-structure IsMultiAdjMatrix (A : Matrix α α ℕ) : Prop where
-  symm : A.IsSymm := by aesop
+def isMultiAdjMatrix (A : Matrix α α ℕ) : Prop :=
+  A.IsSymm
 
 
 /-- `adjMultiplicity u v` is the number of edges connecting `u` and `v`.
@@ -60,7 +64,7 @@ noncomputable def adjMultiplicity (G : Graph α β) (u v : α) : ℕ :=
 
 
 /-- `adjMatrixMulti G` is the adjacency matrix the multigraph `G` -/
-noncomputable def adjMatrixMulti (G : Graph α β) : Matrix α α ℕ :=
+noncomputable def adjMatrixMulti (G : Graph α β) : Matrix α α ℝ :=
   fun u v => adjMultiplicity G u v
 
 
@@ -70,14 +74,23 @@ def degree (G : Graph α β) (v : α) [Fintype (G.incidenceSet v)] : ℕ :=
 
 
 /-- A locally finite graph is regular of degree `d` if every vertex has degree `d`. -/
-def IsRegularOfDegree (d : ℕ) [∀ v : α, Fintype (G.incidenceSet v)] : Prop :=
+def isRegularOfDegree (d : ℕ) [∀ v : α, Fintype (G.incidenceSet v)] : Prop :=
   ∀ (v : α), v ∈ G.vertexSet → degree G v = d
 
 
 /-- Given a `d`-regular graph `G`, `d` is an eigenvalue of its adjacency matrix -/
-theorem degreeIsEigvalOfRegularGraph (d : ℕ) (hG : IsRegularOfDegree G d) :
-  1 = 2 :=
-  sorry
+theorem degreeIsEigvalOfRegularGraph (d : ℕ)
+  (hG : isRegularOfDegree G d)
+  (hA : (adjMatrixMulti G).IsHermitian) :
+    ∃ i, hA.eigenvalues i = d := by
+      let v : α → ℝ := fun _ => 1
+      have h_ev : (adjMatrixMulti G) *ᵥ v = d • v := by sorry
+      -- proof that 1,1,1,1,1 is an eigenvector, also 1,...,1 ≠ 0
+
+/- hasEigenvector_iff then,  x ∈ f.eigenspace μ ∧ x ≠ 0
+also Module.End.mem_eigenspace_iff-/
+      sorry
+
 
 
 end ExpanderGraphs

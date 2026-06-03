@@ -1,1 +1,6 @@
-/.lake
+.lake/
+.lake*
+docbuild/.lake/
+
+.vscode/
+.DS_Store
