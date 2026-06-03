@@ -5,7 +5,7 @@ Authors: Celio Boulay, Dylan Sparrow, Rafael Castro
 -/
 
 import Mathlib.Data.Set.Card
-import Mathlib.Data.Real.Archimedean
+import Mathlib.Algebra.Order.Archimedean.Basic
 import Mathlib.Combinatorics.Graph.Basic
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Analysis.Matrix.Spectrum
