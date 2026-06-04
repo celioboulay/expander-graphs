@@ -36,7 +36,7 @@ def edgeBoundary (S : Set α) : Set β :=
 
 
 /-- The Edge Expansion is defined as: `min{frac{|∂S| / |S|, 0<|S|≤n/2}`. -/
-noncomputable def edgeExpansion (G : Graph α β) : ℝ :=
+noncomputable def cheegerConstant (G : Graph α β) : ℝ :=
   let n : ℝ := (Set.ncard G.vertexSet : ℝ)
   sInf (
     ((fun S : Set α ↦ (Set.ncard (edgeBoundary G S) : ℝ) / (Set.ncard S : ℝ)) ''
@@ -60,7 +60,7 @@ def isExpander (G : Graph α β) : Prop := G = G -- TODO
 /-- A sequence of k-regular graphs `{g i}` of size increasing with i
 is a family of Expander Graphs if `∃ ε > 0` s.t. `h(Gi) ≥ ε`, for all i. -/
 def expanderSequence (g : ℕ → Graph α β) (ε : ℝ) : Prop :=
-  ε > 0 ∧ ∀ i : ℕ, ε ≤ edgeExpansion (g i)
+  ε > 0 ∧ ∀ i : ℕ, ε ≤ cheegerConstant (g i)
 
 
 /-- `A : Matrix α α ℕ` is qualified as the adjacency
