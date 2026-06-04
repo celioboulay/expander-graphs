@@ -53,8 +53,8 @@ theorem cheeger_positive_iff_connected {G : Graph α β} (_ : G.IsFinite) :
   sorry
 
 
-/-- A finite graph `G` is a \textbf{`(k, \varepsilon)`-expander}
-  if each vertex of `G` has valency at most `k`, and `h(G) \ge \varepsilon > 0`. -/
+/-- A finite graph `G` is a (k, ε)-expander
+  if each vertex of `G` has valency at most `k`, and `h(G) ≥  ε > 0`. -/
 def IsExpander (k : ℕ) (ε : ℝ) (_ : G.IsFinite) : Prop :=
   ∀ v ∈ G.vertexSet, (G.incidenceSet v).ncard ≤ k ∧ ε ≤ cheegerConstant G ∧ 0 < ε
 
