@@ -5,27 +5,26 @@ Authors: Celio Boulay, Dylan Sparrow, Rafael Castro
 -/
 
 import Mathlib.Data.Set.Card
-import Mathlib.Algebra.Order.Archimedean.Basic
+import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Combinatorics.Graph.Basic
 import Mathlib.LinearAlgebra.Matrix.Symmetric
-import Mathlib.Analysis.Matrix.Spectrum
+import Mathlib.Algebra.Order.Archimedean.Basic
 
 /-!
 # Expander Graphs
 
 TODO: write documentation :)
-Move things in different files (e.g. split multigraphs and expanders)
+Probably move things in different files
 
 ## References
-* [Irit Dinur. The PCP theorem by gap amplification. ECCC, 2005.][Dinur2005]
-
+* [S. Hoory, N. Linial and A. Wigderson. Expander graphs and their applications.][Expander2006]
+* [M. Cencelj, J. Dydak and A. Vavpetič. Large Scale Versus Small Scale.][Cencelj2014]
 -/
 
 namespace ExpanderGraphs
 
-variable {α β : Type*} [Fintype α] [DecidableEq α] [OfNat α 0] [OfNat α 1]
+variable {α β : Type*} [Fintype α] [DecidableEq α]
 variable (G : Graph α β)
-variable [CommSemiring α] [Ring α] [Algebra ℝ α]
 variable [locally_finite : ∀ v : α, Fintype (G.incidenceSet v)]
 
 open Matrix
@@ -45,9 +44,22 @@ noncomputable def edgeExpansion (G : Graph α β) : ℝ :=
   )
 
 
+omit [DecidableEq α] [Fintype α] in -- temp
+/-- The Cheeger constant is strictly positive if and only if $G$ is a connected graph. -/
+theorem cheeger_positive_iff_connected (G : Graph α β) :
+  1 = 2 := by
+  classical
+  sorry
+
+
+/-- A finite graph `G` is a \textbf{`(k, \varepsilon)`-expander}
+  if each vertex of `G` has valency at most `k`, and `h(G) \ge \varepsilon > 0`. -/
+def isExpander (G : Graph α β) : Prop := G = G -- TODO
+
+
 /-- A sequence of k-regular graphs `{g i}` of size increasing with i
 is a family of Expander Graphs if `∃ ε > 0` s.t. `h(Gi) ≥ ε`, for all i. -/
-def expanderFamily (g : ℕ → Graph α β) (ε : ℝ) : Prop :=
+def expanderSequence (g : ℕ → Graph α β) (ε : ℝ) : Prop :=
   ε > 0 ∧ ∀ i : ℕ, ε ≤ edgeExpansion (g i)
 
 
@@ -74,23 +86,8 @@ def degree (G : Graph α β) (v : α) [Fintype (G.incidenceSet v)] : ℕ :=
 
 
 /-- A locally finite graph is regular of degree `d` if every vertex has degree `d`. -/
-def isRegularOfDegree (d : ℕ) [∀ v : α, Fintype (G.incidenceSet v)] : Prop :=
+def isRegularOfDegree (d : ℕ) : Prop :=
   ∀ (v : α), v ∈ G.vertexSet → degree G v = d
-
-
-/-- Given a `d`-regular graph `G`, `d` is an eigenvalue of its adjacency matrix -/
-theorem degreeIsEigvalOfRegularGraph (d : ℕ)
-  (hG : isRegularOfDegree G d)
-  (hA : (adjMatrixMulti G).IsHermitian) :
-    ∃ i, hA.eigenvalues i = d := by
-      let v : α → ℝ := fun _ => 1
-      have h_ev : (adjMatrixMulti G) *ᵥ v = d • v := by sorry
-      -- proof that 1,1,1,1,1 is an eigenvector, also 1,...,1 ≠ 0
-
-/- hasEigenvector_iff then,  x ∈ f.eigenspace μ ∧ x ≠ 0
-also Module.End.mem_eigenspace_iff-/
-      sorry
-
 
 
 end ExpanderGraphs

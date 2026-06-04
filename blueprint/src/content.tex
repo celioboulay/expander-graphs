@@ -1,7 +1,38 @@
-% In this file you should put the actual content of the blueprint.
-% It will be used both by the web and the print version.
-% It should *not* include the \begin{document}
-%
-% If you want to split the blueprint content into several files then
-% the current file can be a simple sequence of \input. Otherwise It
-% can start with a \section or \chapter for instance.
+\section{Preliminaries}
+
+\begin{definition}
+    \label{def:edgeBoundary}
+    \lean{ExpanderGraphs.edgeBoundary}
+    The \textbf{Edge Boundary} of a set $S$, denoted $\partial S$, is $\partial S = E(S, \overline{S})$. This is the set of edges emanating from the set $S$ to its complement.
+\end{definition}
+
+\begin{definition}
+  \label{def:cheegerConstant}
+  \lean{ExpanderGraphs.cheegerConstant}
+  The \textbf{Cheeger constant} (also called edge expansion, or conductance) of a finite graph $G$ with vertex set V, denoted $h(G)$, is defined by
+  \[
+  h(G) := \min \left\{ \frac{|\partial S|}{|S|} \ \middle|\ S \subseteq V, \ 0 < |S| \le \frac{|V|}{2} \right\}.
+  \]
+\end{definition}
+
+\begin{theorem}
+  \label{thm:cheeger_positive_iff_connected}
+  \lean{ExpanderGraphs.cheeger_positive_iff_connected}
+  The Cheeger constant is strictly positive if and only if $G$ is a connected graph.
+\end{theorem}
+
+\begin{proof}
+Left as an exercise to the lean compiler.
+\end{proof}
+
+\begin{definition}
+  \label{def:expander_graph}
+  \lean{ExpanderGraphs.isExpander}
+  A finite graph $G$ is a \textbf{$(k, \varepsilon)$-expander} if each vertex of $G$ has valency at most $k$, and $h(G) \ge \varepsilon > 0$.
+\end{definition}
+
+\begin{definition}
+  \label{def:expander_sequence}
+  \lean{ExpanderGraphs.expanderSequence}
+  A sequence of finite graphs $\{G_i\}$ is called an \textbf{expander sequence} if $|G_i| \to \infty$ and there exists $k, \varepsilon$ such that each $G_i$ is a $(k, \varepsilon)$-expander.
+\end{definition}
