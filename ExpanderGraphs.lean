@@ -1,1 +1,3 @@
 import ExpanderGraphs.Basic
+import ExpanderGraphs.Matrix
+import ExpanderGraphs.Expanders

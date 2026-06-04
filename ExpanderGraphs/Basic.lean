@@ -7,87 +7,46 @@ Authors: Celio Boulay, Dylan Sparrow, Rafael Castro
 import Mathlib.Data.Set.Card
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Combinatorics.Graph.Basic
-import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Algebra.Order.Archimedean.Basic
 
 /-!
-# Expander Graphs
+# Preliminaries
 
-TODO: write documentation :)
-Probably move things in different files
-
-## References
-* [S. Hoory, N. Linial and A. Wigderson. Expander graphs and their applications.][Expander2006]
-* [M. Cencelj, J. Dydak and A. Vavpetič. Large Scale Versus Small Scale.][Cencelj2014]
+This file defines essential properties about graphs (such as connectivity)
+that were only available for SimpleGraph in mathlib (as of Jun 2026).
 -/
 
-namespace ExpanderGraphs
+namespace Graph
 
-variable {α β : Type*} [Fintype α] [DecidableEq α]
+variable {α β : Type*}
 variable (G : Graph α β)
-variable [locally_finite : ∀ v : α, Fintype (G.incidenceSet v)]
-
-open Matrix
-
-/-- The Edge Boundary of a set S, denoted ∂S, is `∂S = E(S, Sᶜ)`.\
-This is the set of edges emanating from the set S to its complement. -/
-def edgeBoundary (S : Set α) : Set β :=
-  {e | ∃ u ∈ S, ∃ v ∈ Sᶜ, G.IsLink e u v}
 
 
-/-- The Edge Expansion is defined as: `min{frac{|∂S| / |S|, 0<|S|≤n/2}`. -/
-noncomputable def cheegerConstant (G : Graph α β) : ℝ :=
-  let n : ℝ := (Set.ncard G.vertexSet : ℝ)
-  sInf (
-    ((fun S : Set α ↦ (Set.ncard (edgeBoundary G S) : ℝ) / (Set.ncard S : ℝ)) ''
-    {S : Set α | S ⊆ G.vertexSet ∧ 0 < Set.ncard S ∧ (Set.ncard S : ℝ) ≤ n / 2} : Set ℝ)
-  )
+/-- A finite graph is a graph in which the vertex set and the edge set are finite sets. -/
+def IsFinite : Prop :=
+  Finite G.vertexSet ∧ Finite G.edgeSet
 
 
-omit [DecidableEq α] [Fintype α] in -- temp
-/-- The Cheeger constant is strictly positive if and only if $G$ is a connected graph. -/
-theorem cheeger_positive_iff_connected (G : Graph α β) :
-  1 = 2 := by
-  classical
-  sorry
+/-- A walk is a sequence of adjacent vertices.  For vertices `u v : G.vertexSet ⊆ α`,
+the type `walk u v` consists of all walks starting at `u` and ending at `v`. -/
+inductive Walk (G : Graph α β) : α → α → Type _
+  | nil {v : α} (hv : v ∈ G.vertexSet) : G.Walk v v
+  | cons {u v w : α} (e : β) (h_link : G.IsLink e u v) (p : G.Walk v w) : G.Walk u w
+  deriving DecidableEq
 
 
-/-- A finite graph `G` is a \textbf{`(k, \varepsilon)`-expander}
-  if each vertex of `G` has valency at most `k`, and `h(G) \ge \varepsilon > 0`. -/
-def isExpander (G : Graph α β) : Prop := G = G -- TODO
+/-- Two vertices are *reachable* if there is a walk between them. -/
+def Reachable (u v : α) : Prop := Nonempty (G.Walk u v)
+
+/-- A graph is preconnected if every pair of vertices is reachable from one another. -/
+def Preconnected : Prop := ∀ u v : G.vertexSet, G.Reachable u v
+
+/-- A graph is connected if it's preconnected and contains at least one vertex.
+There is a `CoeFun` instance so that `h u v` can be used instead of `h.Preconnected u v`. -/
+@[mk_iff]
+structure Connected : Prop where
+  protected preconnected : Preconnected G
+  protected [nonempty : Nonempty G.vertexSet]
 
 
-/-- A sequence of k-regular graphs `{g i}` of size increasing with i
-is a family of Expander Graphs if `∃ ε > 0` s.t. `h(Gi) ≥ ε`, for all i. -/
-def expanderSequence (g : ℕ → Graph α β) (ε : ℝ) : Prop :=
-  ε > 0 ∧ ∀ i : ℕ, ε ≤ cheegerConstant (g i)
-
-
-/-- `A : Matrix α α ℕ` is qualified as the adjacency
-matrix of a multigraph if `A` is symmetric. -/
-def isMultiAdjMatrix (A : Matrix α α ℕ) : Prop :=
-  A.IsSymm
-
-
-/-- `adjMultiplicity u v` is the number of edges connecting `u` and `v`.
-We use the convention that if `u` has a self-loop, this loop counts twice. -/
-noncomputable def adjMultiplicity (G : Graph α β) (u v : α) : ℕ :=
-  {e : G.edgeSet | G.IsLink e u v}.ncard
-
-
-/-- `adjMatrixMulti G` is the adjacency matrix the multigraph `G` -/
-noncomputable def adjMatrixMulti (G : Graph α β) : Matrix α α ℝ :=
-  fun u v => adjMultiplicity G u v
-
-
-/-- `G.degree v` is the number of vertices adjacent to `v`. -/
-def degree (G : Graph α β) (v : α) [Fintype (G.incidenceSet v)] : ℕ :=
-  Fintype.card (G.incidenceSet v)
-
-
-/-- A locally finite graph is regular of degree `d` if every vertex has degree `d`. -/
-def isRegularOfDegree (d : ℕ) : Prop :=
-  ∀ (v : α), v ∈ G.vertexSet → degree G v = d
-
-
-end ExpanderGraphs
+end Graph
