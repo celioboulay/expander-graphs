@@ -1,10 +1,22 @@
+\chapter{Preliminaries}
+
+\section{Eigvenvalues of a Graph}
+
+We use the notations from [Spielman2025].
+$\mu_i$ is the i-th eigenvalue of the \textit{adjacency} matrix $M$ of a graph,
+and $\lambda_i$  is the i-th eigenvalue of the \textit{Laplacian} matrix $L$ of a graph\footnote{In the Lean code, we will write $l_i$ instead of $\lambda_i$ since $\lambda$ has a different role and thus is not allowed.}.\\
+
+\textit{\textbf{TODO:}} define Lap, claim it is Hermitian, state values $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$ and so on.
+
 \chapter{Graph Partitioning}
 
 Throughout this section, let $V$ be a finite type representing the vertices, and $G$ be a simple graph on $V$.
 
+\section{Isoperimetry}
+
 \begin{definition}
     \label{def:boundary}
-    \lean{GraphPartitioning.boundary}
+    \lean{GraphPartitioning.Isoperimetry.boundary}
     \leanok
     The \textbf{Edge Boundary} of a set $S \subseteq V$, denoted $\partial S$, is the set of edges emanating from the set $S$ to its complement:
     \[
@@ -12,9 +24,10 @@ Throughout this section, let $V$ be a finite type representing the vertices, and
     \]
 \end{definition}
 
+
 \begin{definition}
     \label{def:isoperimetricRatio}
-    \lean{GraphPartitioning.isoperimetricRatio}
+    \lean{GraphPartitioning.Isoperimetry.isoperimetricRatio}
     \uses{def:boundary}
     \leanok
     The \textbf{isoperimetric ratio} of a set $S \subseteq V$, denoted $\theta(S)$, is the ratio of the size of its edge boundary to its own size:
@@ -23,9 +36,10 @@ Throughout this section, let $V$ be a finite type representing the vertices, and
     \]
 \end{definition}
 
+
 \begin{definition}
     \label{def:isoperimetricRatioGraph}
-    \lean{GraphPartitioning.isoperimetricRatioGraph}
+    \lean{GraphPartitioning.Isoperimetry.isoperimetricRatioGraph}
     \uses{def:isoperimetricRatio}
     \leanok
     The \textbf{isoperimetric ratio of the graph} $G$, denoted $\theta(G)$, is defined as the infimum of $\theta(S)$ over all non-empty subsets $S$ whose size does not exceed half the total number of vertices:
@@ -34,9 +48,10 @@ Throughout this section, let $V$ be a finite type representing the vertices, and
     \]
 \end{definition}
 
+
 \begin{theorem}
     \label{thm:isoperimetric_positive_iff_connected}
-    \lean{GraphPartitioning.isoperimetric_positive_iff_connected}
+    \lean{GraphPartitioning.Isoperimetry.Connectivity.isoperimetricRatioGraph_pos_iff_connected}
     \uses{def:isoperimetricRatioGraph}
     The isoperimetric ratio of $G$ is strictly positive if and only if $G$ is a connected graph:
     \[
@@ -45,5 +60,101 @@ Throughout this section, let $V$ be a finite type representing the vertices, and
 \end{theorem}
 
 \begin{proof}
-    Left as an exercise to the Lean compiler. (will write soon)
+    Left as an exercise for the Lean compiler.
+\end{proof}
+
+
+
+\begin{theorem} % Theorem 20.1.1 [Spielman]
+    \label{thm:graphLapEigvals_mul_le_isoperimetricRatio}
+    \lean{GraphPartitioning.Isoperimetry.graphLapEigvals_mul_le_isoperimetricRatio}
+    \uses{def:isoperimetricRatioGraph}
+    For every $S \subset V$
+    \[
+    \theta(S) \geq \lambda_2(1 - s),
+    \]
+    where $s = |S| / |V|$.
+\end{theorem}
+
+\begin{proof}
+    TODO
+\end{proof}
+
+\begin{theorem}
+    \label{thm:graphLapEigvals_div_two_le_isoperimetricRatioGraph}
+    \lean{GraphPartitioning.Isoperimetry.graphLapEigvals_div_two_le_isoperimetricRatioGraph}
+    \uses{thm:graphLapEigvals_mul_le_isoperimetricRatio}
+    From \ref{thm:graphLapEigvals_mul_le_isoperimetricRatio}, we deduce:
+    \[
+    \theta_G \geq \lambda_2/2.
+    \]
+\end{theorem}
+
+\begin{proof}
+    TODO
+\end{proof}
+
+
+\chapter{Expander Graphs} % Essentially Chapter 27 of Spielman's book
+
+\section{Properties}
+
+We say that a d-regular graph is a good expander if all of its adjacency matrix eigenvalues are
+small. To quantify this, we set a threshold $\epsilon > 0$, and require that each adjacency matrix
+eigenvalue, other than $\mu_1 = d$, has absolute value at most $\epsilon d$.
+
+\begin{definition}[$\epsilon$-expander]
+A $d$-regular graph $G$ is an $\epsilon$-expander if there exists $\epsilon > 0$ such that:
+\[
+\forall i \geq 2, \quad |\mu_i| \leq \epsilon d
+\]
+
+\end{definition}
+
+
+
+\begin{definition}[$\epsilon$-approximation]
+We define a graph $G$ to be an $\epsilon$-approximation of a graph $H$ if
+\[
+(1 - \epsilon)H \preccurlyeq G \preccurlyeq (1 + \epsilon)H,
+\]
+where  $H \preccurlyeq G$ if for all $\boldsymbol{x}$
+\[
+\boldsymbol{x}^T \boldsymbol{L}_H \boldsymbol{x} \leq \boldsymbol{x}^T \boldsymbol{L}_G \boldsymbol{x}.
+\]
+\end{definition}
+
+
+
+We now prove that being an expander is equivalent to approximating the complete graph.
+
+\begin{theorem}
+$G$ is an $\epsilon$-expander if and only if $G$ $\epsilon$-approximates $H = \frac{d}{n}K_n$
+\end{theorem}
+
+\begin{proof}
+    TODO
+\end{proof}
+
+
+
+
+\newpage
+
+\section{Expander Mixing Lemma}
+
+% This is one of the first major results we will try to formalize in Lean but first we need
+% to build all of the definitions around it
+
+\begin{theorem}
+    \label{thm:expander_mixing_lemma}
+    Let $G = (V, E)$ be a $d$-regular graph that $\epsilon$-approximates $\frac{d}{n}K_n$. Then, for every $S \subseteq V$ and $T \subseteq V$,
+    \[
+    \left| |\vec{E}(S,T)| - \alpha\beta dn \right| \leq \epsilon dn \sqrt{(\alpha - \alpha^2)(\beta - \beta^2)},
+    \]
+    where $|S| = \alpha n$ and $|T| = \beta n$.
+\end{theorem}
+
+\begin{proof}
+    TODO
 \end{proof}
