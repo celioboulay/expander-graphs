@@ -1,3 +1,2 @@
 import ExpanderGraphs.Basic
-import ExpanderGraphs.Expanders
-import ExpanderGraphs.Matrix
+import ExpanderGraphs.GraphPartitioning

@@ -1,7 +1,7 @@
 # Expander Graphs
 A Lean 4 project depending on [mathlib](https://github.com/leanprover-community/mathlib4).
 
-Goal is to formalize Expander Graphs and related Spectral Graph Theory results. [Link](https://celioboulay.github.io/expander-graphs/) to the blueprintof the project.
+Goal is to formalize Expander Graphs and related Spectral Graph Theory results. [Link](https://celioboulay.github.io/expander-graphs/) to the blueprint of the project.
 
 ## Prereqs
 

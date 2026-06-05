@@ -1,114 +1,49 @@
-\chapter{Preliminaries}
+\chapter{Graph Partitioning}
 
-A graph is $G = (V, E)$ is [\dots]
-Throughout this report, $\alpha$ denotes the universe in which the vertices live.
-
+Throughout this section, let $V$ be a finite type representing the vertices, and $G$ be a simple graph on $V$.
 
 \begin{definition}
-    \label{def:finitegraph}
-    \lean{Graph.IsFinite}
+    \label{def:boundary}
+    \lean{GraphPartitioning.boundary}
     \leanok
-    A finite graph is a graph in which the vertex set and the edge set are finite sets.
+    The \textbf{Edge Boundary} of a set $S \subseteq V$, denoted $\partial S$, is the set of edges emanating from the set $S$ to its complement:
+    \[
+    \partial S = \{e \in E(G) \mid \exists a \in S, \exists b \in S^c, e = \{a, b\}\}
+    \]
 \end{definition}
 
-
 \begin{definition}
-    \label{def:graphwalk}
-    \lean{Graph.Walk}
+    \label{def:isoperimetricRatio}
+    \lean{GraphPartitioning.isoperimetricRatio}
+    \uses{def:boundary}
     \leanok
-    A walk is a sequence of adjacent vertices.\\For vertices u v $\in$ $V ⊆ \alpha$, walk u v consists of all walks starting at u and ending at v.
+    The \textbf{isoperimetric ratio} of a set $S \subseteq V$, denoted $\theta(S)$, is the ratio of the size of its edge boundary to its own size:
+    \[
+    \theta(S) := \frac{|\partial S|}{|S|}
+    \]
 \end{definition}
 
-
 \begin{definition}
-    \label{def:reachable}
-    \lean{Graph.Reachable}
-    \uses{def:graphwalk}
+    \label{def:isoperimetricRatioGraph}
+    \lean{GraphPartitioning.isoperimetricRatioGraph}
+    \uses{def:isoperimetricRatio}
     \leanok
-    Two vertices are reachable if there is a walk (a path) between them.
+    The \textbf{isoperimetric ratio of the graph} $G$, denoted $\theta(G)$, is defined as the infimum of $\theta(S)$ over all non-empty subsets $S$ whose size does not exceed half the total number of vertices:
+    \[
+    \theta(G) := \inf \left\{ \theta(S) \ \middle|\ S \subseteq V, \ 0 < |S| \le \frac{|V|}{2} \right\}
+    \]
 \end{definition}
-
-
-\begin{definition}
-    \label{def:preconnected}
-    \lean{Graph.Preconnected}
-    \uses{def:reachable}
-    \leanok
-    A graph is preconnected if every pair of vertices is reachable from one another.
-\end{definition}
-
-
-\begin{definition}
-    \label{def:connected}
-    \lean{Graph.Connected}
-    \uses{def:preconnected}
-    \leanok
-    A graph is connected if it is preconnected and contains at least one vertex
-\end{definition}
-
-
-\chapter{Expander Graphs}
-
-\section{Expansion}
-
-\begin{definition}
-    \label{def:edgeBoundary}
-    \lean{ExpanderGraphs.edgeBoundary}
-    \leanok
-    The \textbf{Edge Boundary} of a set $S$, denoted $\partial S$, is $\partial S = E(S, \overline{S})$. This is the set of edges emanating from the set $S$ to its complement.
-\end{definition}
-
-
-\begin{definition}
-  \label{def:cheegerConstant}
-  \lean{ExpanderGraphs.cheegerConstant}
-  \uses{def:edgeBoundary}
-  \leanok
-  The \textbf{Cheeger constant} (also called edge expansion, or conductance) of a finite graph $G$ with vertex set V, denoted $h(G)$, is defined by
-  \[
-  h(G) := \min \left\{ \frac{|\partial S|}{|S|} \ \middle|\ S \subseteq V, \ 0 < |S| \le \frac{|V|}{2} \right\}.
-  \]
-\end{definition}
-
-
-\begin{lemma}
-    \label{lem:connected_edgeBoundary_nonempty}
-    \lean{ExpanderGraphs.connected_edgeBoundary_nonempty}
-    \uses{def:edgeBoundary, def:connected}
-    If G is a connected graph, every non empty proper subset of its vertices has a non empty edge boundary.
-\end{lemma}
-\begin{proof}
-    By contradiction.
-\end{proof}
-
 
 \begin{theorem}
-  \label{thm:cheeger_positive_iff_connected}
-  \lean{ExpanderGraphs.cheeger_positive_iff_connected}
-  \uses{def:connected, def:cheegerConstant, lem:connected_edgeBoundary_nonempty}
-  The Cheeger constant is strictly positive if and only if $G$ is a connected graph.
+    \label{thm:isoperimetric_positive_iff_connected}
+    \lean{GraphPartitioning.isoperimetric_positive_iff_connected}
+    \uses{def:isoperimetricRatioGraph}
+    The isoperimetric ratio of $G$ is strictly positive if and only if $G$ is a connected graph:
+    \[
+    0 < \theta(G) \iff G.\text{Connected}
+    \]
 \end{theorem}
 
 \begin{proof}
-Left as an exercise to the lean compiler. (will write soon)
+    Left as an exercise to the Lean compiler. (will write soon)
 \end{proof}
-
-
-\section{Expander Graphs}
-
-
-\begin{definition}
-  \label{def:expander_graph}
-  \lean{ExpanderGraphs.IsExpander}
-  \uses{def:cheegerConstant}
-  \leanok
-  A finite graph $G$ is a \textbf{$(k, \varepsilon)$-expander} if each vertex of $G$ has valency at most $k$, and $h(G) \ge \varepsilon > 0$.
-\end{definition}
-
-\begin{definition}
-  \label{def:expander_sequence}
-  \lean{ExpanderGraphs.expanderSequence}
-  \uses{def:expander_graph}
-  \leanok
-  A sequence of finite graphs $\{G_i\}$ is called an \textbf{expander sequence} if $|G_i| \to \infty$ and there exists $k, \varepsilon$ such that each $G_i$ is a $(k, \varepsilon)$-expander.
-\end{definition}
