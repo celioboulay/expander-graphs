@@ -1,38 +1,90 @@
-import ExpanderGraphs.GraphPartitioning
-import Mathlib.LinearAlgebra.Matrix.Defs
-import Mathlib.Combinatorics.SimpleGraph.Finite
+/-
+Copyright (c) 2026 Celio Boulay. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Celio Boulay, Dylan Sparrow, Rafael Castro
+-/
 
-variable {V : Type*} [Fintype V]
-variable (n : ℕ) [hV : Fact (Fintype.card V = n)] [Fact (1 < n)]
-variable (G : SimpleGraph V) [DecidableRel G.Adj]
-variable (S T : Finset V)
-variable (nS : ℕ) (hnS : S.card = nS) (nT : ℕ) (hnT : T.card = nT)
-variable (d : ℕ) (hG : G.IsRegularOfDegree d)
+module
 
-open GraphPartitioning.Isoperimetry
+public import ExpanderGraphs.Basic
+public import Mathlib.Analysis.Matrix.Order
 
-/-- The ordered edge set from a subset `S` to a subset `T` in a graph `G`.
-Given two subsets of vertices `S` and `T`, `\vec E(S, T)`
-is the set of all directed pairs `(u, v)` such that `u ∈ S`, `v ∈ T`,
-and there is an edge between `u` and `v` in `G`. -/
-def orderedEdgeFinset (S T : Finset V) : Finset (V × V) :=
-  (S ×ˢ T).filter (fun p => G.Adj p.1 p.2)
+/-!
+# Expander Mixing Lemma
 
-/-- Number of edges in orderedEdgeFinset -/
-def OES (S T : Finset V) : ℝ :=
-  (orderedEdgeFinset G S T).card
+TODO: write doc
+-/
 
 
-variable (l : ℝ) -- the max eigenvalue
-
-def vecOnes : V → ℝ := fun _ => 1
+@[expose] public section
 
 
-lemma OES_indicator_prod :
-  OES G S T = ∑ u : V, ∑ v : V, setIndicator S u * G.adjMatrix ℝ u v * setIndicator T v := by
-  sorry
+variable {α β : Type*}
+variable {G : Graph α β} [Fintype α]
 
 
-theorem ExpanderMixingLemma :
-  abs (OES G S T - d * (nS * nT) / n) ≤ l * d * Real.sqrt (nS * nT) := by
-  sorry
+open Classical in
+/-- Eigenvalues of the adjMatrix in non-increasing order. -/
+noncomputable def adjEigvals : Fin (Fintype.card α) → ℝ :=
+  (Matrix.isHermitian G).eigenvalues₀
+
+
+/-- The indicator vector of a subset `S` of vertices.
+For any vertex `v`, `setIndicator S v` is `1` if `v ∈ S` and `0` otherwise. -/
+noncomputable def setIndicator (S : Set α) : α → ℝ :=
+  Set.indicator S (fun _ => 1)
+
+
+open Matrix
+
+namespace Graph
+
+variable [∀ s, Fintype (G.incidenceSet s)]
+variable {d : ℕ}
+
+
+lemma degree_mulVec_adj (i : G.vertexSet) (hG : G.IsRegularOfDegree d) :
+  ∑ x, adjMultiplicity G i x = d := by classical
+    unfold adjMultiplicity
+    unfold IsRegularOfDegree degree incidenceSet at hG
+    have hG_i := hG i; rw [← hG_i];
+    sorry
+
+
+
+theorem adjMatrix_mulVec_one_eq_degree (i : α) (hi : i ∈ G.vertexSet) (hG : G.IsRegularOfDegree d) :
+  (adjMatrixMulti G *ᵥ 1) i = (d : ℝ) := by
+    unfold adjMatrixMulti
+    simp only [mulVec, dotProduct, Pi.one_apply, mul_one]
+    rw [← Nat.cast_sum]
+    norm_cast
+    exact degree_mulVec_adj ⟨i, hi⟩ hG
+
+
+open GraphPartitioning
+
+variable {l : ℝ} -- max eigenvalue of the graph
+variable {d : ℕ}
+variable {n : ℝ} [Fact (n = G.vertexSet.ncard)] [Fact (1 < n)]
+
+
+/-- Number of edges -/
+noncomputable def EOS (S T : Set α) : ℝ := (orderedEdgeSet G S T).ncard
+
+
+/-- The indicator vector of a subset `S` of vertices.
+For any vertex `v`, `setIndicator S v` is `1` if `v ∈ S` and `0` otherwise. -/
+noncomputable def setIndicator (S : Set α) : α → ℝ :=
+  Set.indicator S (fun _ => 1)
+
+
+theorem ExpanderMixingLemma (S T : Set α) (_ : G.IsRegularOfDegree d) :
+  let e := G.EOS S T
+  let nS := (S.ncard); let nT := (T.ncard)
+  abs (e - d * (nS * nT) / n) ≤ l * d * Real.sqrt (nS * nT) := sorry
+
+
+
+end Graph
+
+end

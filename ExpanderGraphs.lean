@@ -1,2 +1,2 @@
 import ExpanderGraphs.Basic
-import ExpanderGraphs.GraphPartitioning
+import ExpanderGraphs.ExpanderMixingLemma
