@@ -9,6 +9,7 @@ module
 public import Mathlib.Data.Set.Card
 public import Mathlib.Data.FunLike.Basic
 public import Mathlib.Order.Filter.Tendsto
+public import Mathlib.Analysis.Matrix.Order
 public import Mathlib.Analysis.Matrix.Spectrum
 public import Mathlib.Combinatorics.Graph.Basic
 public import Mathlib.LinearAlgebra.Matrix.Symmetric
@@ -21,6 +22,7 @@ public import Mathlib.Algebra.Order.Archimedean.Real.Basic
 * [Spectral Graph Theory, Fan Chung][Chung]
 -/
 
+set_option linter.unusedFintypeInType false
 
 @[expose] public section
 
@@ -105,7 +107,6 @@ def Adjacency : Matrix α α ℝ :=
 abbrev Identity := (1 : Matrix α α ℝ)
 
 
-omit [Fintype α] in
 /-- When G is k-regular, it is easy to see that `L = I − 1/k * A` -/
 lemma LapOfRegGraph {k : ℕ} : G.IsRegularOfDegree k →
   G.Laplacian = Identity - (1 / (k : ℝ)) • G.Adjacency := by
@@ -134,7 +135,6 @@ def BoundaryOperator : Matrix α β ℝ := sorry
 lemma LSS : G.Laplacian = BoundaryOperator * (BoundaryOperator)ᵀ := sorry
 
 
-omit [Fintype α] in
 /-- Proof that the Laplacian as defined above, is Hermitian. -/
 lemma LapHermitian : G.Laplacian.IsHermitian := by
   unfold IsHermitian; simp only [conjTranspose_eq_transpose_of_trivial];
@@ -146,6 +146,15 @@ lemma LapHermitian : G.Laplacian.IsHermitian := by
     rw [if_neg hnot, if_neg h]
     rw [mul_comm (degree u : ℝ) (degree v : ℝ)]
     by_cases h : G.Adj v u <;> simp [Graph.adj_comm]
+
+
+/-- Eigenvalues of the Laplacian Matrix in non-increasing order. -/
+def adjEigvals : Fin (Fintype.card α) → ℝ :=
+  Matrix.IsHermitian.eigenvalues₀ G.LapHermitian
+
+
+/-- The volume of a graph is defined as the sum of the degrees of its vertices -/
+def Volume : ℝ≥0 := ∑ v : α, G.degree v
 
 
 
