@@ -47,6 +47,9 @@ noncomputable section
 def degree (v : α) : ℝ≥0 :=
   (G.incidenceSet v).ncard
 
+
+open Matrix
+
 def L : Matrix α α ℝ :=
   fun (u v : α) =>
     if u = v then (G.degree v : ℝ)
@@ -124,7 +127,27 @@ are indexed by the edges of G. Each column corresponding to an edgec`e = {u, v}`
 has an entry `1/√dᵤ` in the row corresponding to `u`, an entry `−1/√dᵥ` in
 the row corresponding to `v`, and has zero entries elsewhere. It can be viewed as
 a boundary operator, hence the name. -/
-def BoundaryOperator := 2 + 2 = 5
+def BoundaryOperator : Matrix α β ℝ := sorry
+
+
+/-- also add G in the statement -/
+lemma LSS : G.Laplacian = BoundaryOperator * (BoundaryOperator)ᵀ := sorry
+
+
+omit [Fintype α] in
+/-- Proof that the Laplacian as defined above, is Hermitian. -/
+lemma LapHermitian : G.Laplacian.IsHermitian := by
+  unfold IsHermitian; simp only [conjTranspose_eq_transpose_of_trivial];
+  ext u v; simp only [transpose_apply];
+  unfold Laplacian;
+  by_cases h : u = v
+  · subst h; rfl
+  · have hnot : v ≠ u := by tauto
+    rw [if_neg hnot, if_neg h]
+    rw [mul_comm (degree u : ℝ) (degree v : ℝ)]
+    by_cases h : G.Adj v u <;> simp [Graph.adj_comm]
+
+
 
 
 
