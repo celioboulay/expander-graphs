@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026 Celio Boulay. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Celio Boulay, Dylan Sparrow, Rafael Castro
+-/
+
 module
 
 public import Mathlib.Data.Set.Card
@@ -29,15 +35,17 @@ structure WeightedGraph (α β : Type*) extends Graph α β where
   edgeDef (e : β) : e ∈ edgeSet ↔ 0 < edgeWeight e
 
 variable {α β : Type*} [DecidableEq α] [Fintype α]
-variable {G : WeightedGraph α β} [∀ s, Fintype (G.incidenceSet s)]
+variable {G : WeightedGraph α β}
 variable [DecidableRel G.Adj]
 
 
 namespace WeightedGraph
 
+noncomputable section
+
 /-- `G.degree v` is the number of edges incident to `v`. -/
 def degree (v : α) : ℝ≥0 :=
-  Fintype.card (G.incidenceSet v)
+  (G.incidenceSet v).ncard
 
 def L : Matrix α α ℝ :=
   fun (u v : α) =>
@@ -45,16 +53,17 @@ def L : Matrix α α ℝ :=
     else if G.Adj u v then -1
     else 0
 
-noncomputable def Laplacian : Matrix α α ℝ :=
+def Laplacian : Matrix α α ℝ :=
   fun (u v : α) =>
     if u = v then if G.degree v = 0 then 0 else 1
     else if G.Adj u v then -1 / Real.sqrt (G.degree v * G.degree u)
     else 0
 
-noncomputable def T_inv_sqrt : Matrix α α ℝ :=
+def T_inv_sqrt : Matrix α α ℝ :=
   fun (u v : α) =>
     if u = v then if G.degree v = 0 then 0 else 1 / Real.sqrt (G.degree v)
     else 0
+
 
 
 lemma Lap_symmetric_normalization : G.Laplacian = G.T_inv_sqrt * G.L * G.T_inv_sqrt := by
@@ -74,9 +83,51 @@ V(G) → R which satisfies *big equation page 3* -/
 noncomputable def LapOperator : (α → ℝ) → (α → ℝ) :=
   fun (g : α → ℝ) =>
     fun (u : α) =>
-      ∑ e ∈ G.incidenceSet u,
-        let v := sorry
-        (g u / (Real.sqrt (G.degree u)) - g v / (Real.sqrt (G.degree v)))
+      ∑ v : α, if G.Adj u v then
+              (g u / Real.sqrt (G.degree u) - g v / Real.sqrt (G.degree v))
+            else 0
 
+
+
+/-- A graph is regular of degree `d` if every vertex has degree `d`. -/
+def IsRegularOfDegree (d : ℕ) : Prop :=
+  ∀ v, G.degree v = d
+
+
+/-- Adjacency Matrix: `A(u, v) = 1` if `u` is adjacent to `v`, and `0` otherwise. -/
+def Adjacency : Matrix α α ℝ :=
+  fun u v => if G.Adj u v then 1 else 0
+
+
+abbrev Identity := (1 : Matrix α α ℝ)
+
+
+omit [Fintype α] in
+/-- When G is k-regular, it is easy to see that `L = I − 1/k * A` -/
+lemma LapOfRegGraph {k : ℕ} : G.IsRegularOfDegree k →
+  G.Laplacian = Identity - (1 / (k : ℝ)) • G.Adjacency := by
+  sorry
+
+
+/-- We say that a graph has no isolation when none of its vertices is isolated. -/
+def NoIsolation := ∀ v : G.vertexSet, ¬ (G.IsIsolated v)
+
+
+/-- The normalized Laplacian matrix of a graph without
+isolated vertices is equal to `L = I - T^(-1/2) * A * T^(-1/2)`. -/
+lemma TodoFindName : G.NoIsolation →
+  G.Laplacian = Identity - G.T_inv_sqrt * G.Adjacency * G.T_inv_sqrt := sorry
+
+
+/-- `S` is the matrix whose rows are indexed by the vertices and whose columns
+are indexed by the edges of G. Each column corresponding to an edgec`e = {u, v}`
+has an entry `1/√dᵤ` in the row corresponding to `u`, an entry `−1/√dᵥ` in
+the row corresponding to `v`, and has zero entries elsewhere. It can be viewed as
+a boundary operator, hence the name. -/
+def BoundaryOperator := 2 + 2 = 5
+
+
+
+end
 
 end WeightedGraph
