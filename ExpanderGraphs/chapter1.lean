@@ -157,6 +157,27 @@ def adjEigvals : Fin (Fintype.card α) → ℝ :=
 def Volume : ℝ≥0 := ∑ v : α, G.degree v
 
 
+/-- Complete Graph `Kₙ` on `n` vertices. -/
+@[ext]
+structure CompleteGraph (α β : Type*) extends WeightedGraph α β where
+  completeness : ∀ (x y : vertexSet), x ≠ y ↔ ∃! e : edgeSet, IsLink e x y
+
+
+/-- The spectrum of a graph -/
+def lapSpectrum (G : WeightedGraph α β) [DecidableRel G.Adj] : Set ℝ :=
+  spectrum ℝ G.Laplacian
+
+
+/-- `0` is an eigenvalue of the Laplacian of a graph. -/
+theorem zero_mem_spectrum_lapMatrix (K : CompleteGraph α β) [DecidableRel K.Adj] :
+    0 ∈ lapSpectrum K.toWeightedGraph := sorry
+
+
+
+/-- For the complete graph `Kₙ` on `n` vertices, the eigenvalues
+are `0` and `n/(n − 1)` (with multiplicity `n − 1`). -/
+lemma zero_mem_complete_graph_spectrum (K : CompleteGraph α β) [DecidableRel K.Adj] :
+    0 ∈ lapSpectrum K.toWeightedGraph := sorry
 
 
 

@@ -1,1 +1,23 @@
-TODO
+\chapter{Preliminaries}
+
+This blueprint follows Fan Chung: Spectral Graph Theory (first published: AMS, 1992).
+
+\section{Weighted Graph}
+
+\begin{definition}[Weighted Graph]
+\label{def:WeightedGraph}
+\lean{WeightedGraph}
+\mathlibok
+We extend the definition of a general graph to that of a weighted graph by defining a weight function over its edges.
+
+\[
+\omega : \beta \to \mathbf{R}_{+}
+\]
+
+with the condition that
+
+\[
+e \in edgeSet \iff 0 < w(e)
+\]
+
+\end{definition}
