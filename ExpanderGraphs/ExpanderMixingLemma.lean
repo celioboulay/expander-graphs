@@ -10,9 +10,9 @@ public import ExpanderGraphs.Basic
 public import Mathlib.Analysis.Matrix.Order
 
 /-!
-# Expander Mixing Lemma
+# Expander Mixing Lemma (outdated also)
 
-TODO: write doc
+Keeping it here since it might be useful later, but this will be moved in other places.
 -/
 
 

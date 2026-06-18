@@ -7,7 +7,7 @@ This blueprint follows Fan Chung: Spectral Graph Theory (first published: AMS, 1
 \begin{definition}[Weighted Graph]
 \label{def:WeightedGraph}
 \lean{WeightedGraph}
-\mathlibok
+\leanok
 We extend the definition of a general graph to that of a weighted graph by defining a weight function over its edges.
 
 \[
@@ -21,3 +21,72 @@ e \in edgeSet \iff 0 < w(e)
 \]
 
 \end{definition}
+
+
+\begin{definition}
+\label{def:degree}    
+\lean{WeightedGraph.degree}
+\leanok
+In a graph G, let $d_v$ denote the degree (number of incident edges) of vertex $v$.
+\end{definition}
+
+
+
+\begin{definition}
+\lean{WeightedGraph.L}
+\label{def:L}
+\leanok
+Consider the matrix L, defined as follows
+\[
+L(u,v)=
+\begin{cases}
+  d_v & \text{if}\ u=v, \\
+  -1 & \text{if}\ u \text{ and }v \text{ are ajacent},\\
+    0 & \text{otherwise}.
+\end{cases}
+\]
+\end{definition}
+
+
+
+
+\begin{definition}
+\lean{WeightedGraph.Laplacian}
+\label{def:Laplacian}
+\leanok
+Consider the matrix $\mathcal{L}$, defined as follows
+\[
+\mathcal{L}(u,v) = \left\{
+\begin{array}{cl}
+    1 & \text{if } u = v \text{ and } d_v \neq 0, \\[1.5ex]
+    -\dfrac{1}{\sqrt{d_u d_v}} & \text{if } u \text{ and } v \text{ are adjacent}, \\[1.5ex]
+    0 & \text{otherwise}.
+\end{array}
+\right.
+\]
+\end{definition}
+
+
+
+\begin{definition}
+\lean{WeightedGraph.T_inv_sqrt}
+\label{def:T_inv_sqrt}
+\leanok
+Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$. We define its invert square root as $T^{-1/2}$ with the convention that $T^{-1/2} = 0$ for $d_v = 0$.
+\end{definition}
+
+
+
+\begin{theorem} [Laplacian symmetric normalization]
+\lean{WeightedGraph.Lap_symmetric_normalization}
+\label{thm:Lap_symmetric_normalization}
+\uses{def:T_inv_sqrt, def:Laplacian, def:L}
+\[
+\mathcal{L} = T^{-1/2} \text{ } L \text{ } T^{-1/2}
+\]
+\end{theorem}
+
+
+\begin{proof}
+@Grok is this true?
+\end{proof}

@@ -52,11 +52,13 @@ def degree (v : α) : ℝ≥0 :=
 
 open Matrix
 
+
 def L : Matrix α α ℝ :=
   fun (u v : α) =>
     if u = v then (G.degree v : ℝ)
     else if G.Adj u v then -1
     else 0
+
 
 def Laplacian : Matrix α α ℝ :=
   fun (u v : α) =>
@@ -64,16 +66,19 @@ def Laplacian : Matrix α α ℝ :=
     else if G.Adj u v then -1 / Real.sqrt (G.degree v * G.degree u)
     else 0
 
+
 def T_inv_sqrt : Matrix α α ℝ :=
-  fun (u v : α) =>
-    if u = v then if G.degree v = 0 then 0 else 1 / Real.sqrt (G.degree v)
-    else 0
+  Matrix.diagonal (fun v => if G.degree v = 0 then 0 else 1 / Real.sqrt (G.degree v))
 
 
-
+/-- `Lap = T_inv_sqrt * L * T_inv_sqrt` -/
 lemma Lap_symmetric_normalization : G.Laplacian = G.T_inv_sqrt * G.L * G.T_inv_sqrt := by
-  ext u v; -- this look more annoying to prove than it should, I may be doing things wrong there
-  sorry
+  ext u v;
+  unfold Laplacian L T_inv_sqrt;
+  split_ifs <;> simp_all +decide [mul_comm, mul_left_comm, div_eq_mul_inv];
+  · field_simp;
+    rw [ Real.sq_sqrt ( NNReal.coe_nonneg _ ) ];
+  · by_cases hu : G.degree u = 0 <;> by_cases hv : G.degree v = 0 <;> simp_all +decide [degree]
 
 
 /-- We say v is an isolated vertex if dᵥ = 0. -/
@@ -85,7 +90,7 @@ def Nontrivial (G : Graph α β) := G.edgeSet ≠ ∅
 
 /-- The Laplacian can be viewed as an operator on the space of functions g :
 V(G) → R which satisfies *big equation page 3* -/
-noncomputable def LapOperator : (α → ℝ) → (α → ℝ) :=
+def LapOperator : (α → ℝ) → (α → ℝ) :=
   fun (g : α → ℝ) =>
     fun (u : α) =>
       ∑ v : α, if G.Adj u v then
@@ -126,8 +131,7 @@ lemma TodoFindName : G.NoIsolation →
 /-- `S` is the matrix whose rows are indexed by the vertices and whose columns
 are indexed by the edges of G. Each column corresponding to an edgec`e = {u, v}`
 has an entry `1/√dᵤ` in the row corresponding to `u`, an entry `−1/√dᵥ` in
-the row corresponding to `v`, and has zero entries elsewhere. It can be viewed as
-a boundary operator, hence the name. -/
+the row corresponding to `v`, and has zero entries elsewhere. -/
 def BoundaryOperator : Matrix α β ℝ := sorry
 
 
@@ -135,6 +139,7 @@ def BoundaryOperator : Matrix α β ℝ := sorry
 lemma LSS : G.Laplacian = BoundaryOperator * (BoundaryOperator)ᵀ := sorry
 
 
+omit [Fintype α] in
 /-- Proof that the Laplacian as defined above, is Hermitian. -/
 lemma LapHermitian : G.Laplacian.IsHermitian := by
   unfold IsHermitian; simp only [conjTranspose_eq_transpose_of_trivial];

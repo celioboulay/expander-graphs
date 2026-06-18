@@ -15,14 +15,9 @@ public import Mathlib.LinearAlgebra.Matrix.Symmetric
 public import Mathlib.Algebra.Order.Archimedean.Real.Basic
 
 /-!
-# Graph Partitioning
+# Outdated definitions
 
-This file defines isoperimetric ratio, and prove results about
-its relation to the second-smallest eigenvalue of the Laplacian.
-
-## References
-* [Spectral and Algebraic Graph Theory, Daniel A. Spielman, 2025][Spielman2025]
-* [S. Hoory, N. Linial and A. Wigderson. Expander graphs and their applications.][Expander2006]
+Keeping it here since it might be useful later, but this will be moved in other places.
 -/
 
 
