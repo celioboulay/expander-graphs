@@ -39,6 +39,7 @@ structure WeightedGraph (α β : Type*) extends Graph α β where
 variable {α β : Type*} [DecidableEq α] [Fintype α]
 variable {G : WeightedGraph α β}
 variable [DecidableRel G.Adj]
+variable (hUniv : G.vertexSet = Set.univ)
 
 
 namespace WeightedGraph
@@ -119,8 +120,7 @@ abbrev Identity := (1 : Matrix α α ℝ)
 
 
 omit [Fintype α] in
-/-- For a loopless, `k`-regular graph,
-`Laplacian = Identity − 1/k * Adjacency` -/
+/-- For a loopless, `k`-regular graph, `Laplacian = Identity − 1/k * Adjacency` -/
 lemma LapOfRegGraph {k : ℕ+} (hLoopless : ∀ v, ¬ G.Adj v v) :
     G.IsRegularOfDegree k →
     G.Laplacian = Identity - (1 / (k : ℝ)) • G.Adjacency := by
@@ -136,10 +136,18 @@ lemma LapOfRegGraph {k : ℕ+} (hLoopless : ∀ v, ¬ G.Adj v v) :
 def NoIsolation := ∀ v : G.vertexSet, ¬ (G.IsIsolated v)
 
 
+
+include hUniv in
 /-- For a graph without isolated vertices, we have
 `Laplacian = Identity - T_inv_sqrt * Adjacency * T_inv_sqrt`. -/
-lemma LapOfNotIsolatedGraph : G.NoIsolation →
-  G.Laplacian = Identity - G.T_inv_sqrt * G.Adjacency * G.T_inv_sqrt := sorry
+lemma LapOfNotIsolatedGraph (hLoopless : ∀ v, ¬ G.Adj v v) : G.NoIsolation →
+  G.Laplacian = Identity - G.T_inv_sqrt * G.Adjacency * G.T_inv_sqrt := by
+  intro hIso; ext u v;
+  have hDu : G.degree u ≠ 0 := hIso ⟨u, by simp [hUniv]⟩
+  have hDv : G.degree v ≠ 0 := hIso ⟨v, by simp [hUniv]⟩
+  unfold Laplacian Adjacency Identity T_inv_sqrt;
+  split_ifs <;> simp_all +decide [div_eq_mul_inv];
+
 
 
 /-- `S` is the matrix whose rows are indexed by the vertices and whose columns
