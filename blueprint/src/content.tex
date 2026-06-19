@@ -1,6 +1,7 @@
 \chapter{Preliminaries}
 
-This blueprint follows Fan Chung: Spectral Graph Theory (first published: AMS, 1992).
+This blueprint follows Fan Chung: Spectral Graph Theory (first published: AMS, 1992).\\
+Unless otherwise specified, all matrices are $n \times n$ where $n$ is the number of vertices in $G$.
 
 \section{Weighted Graph}
 
@@ -33,6 +34,51 @@ In a graph G, let $d_v$ denote the degree (number of incident edges) of vertex $
 
 
 \begin{definition}
+\lean{WeightedGraph.IsRegularOfDegree}
+\uses{def:degree}
+\label{def:IsRegularOfDegree}
+\leanok
+For $k \in \mathbb{N}$, a graph is said to be $k$-regular if every vertex $v$ has degree $d_v = k$.
+\end{definition}
+
+
+
+\begin{definition}
+\lean{WeightedGraph.IsIsolated}
+\label{def:IsIsolated}
+\uses{def:degree}
+\leanok
+A vertex v is said to be isolated if $d_v = 0$.
+\end{definition}
+
+
+\begin{definition}
+\lean{WeightedGraph.NonTrivial}
+\label{def:NonTrivial}
+\leanok
+A graph is said to be nontrivial if it contains at least one edge.
+\end{definition}
+
+
+
+\section{Matrices and Operators}
+
+\begin{definition}
+\lean{WeightedGraph.Adjacency}
+\label{def:Adjacency}
+\leanok
+The adjacency matrix of a graph $G$, denoted $A$ is defined as follows,
+\[
+A(u,v)=
+\begin{cases}
+    1 & \text{if } u \text{ and } v \text{ are adjacent}, \\
+    0 & \text{otherwise}.
+\end{cases}
+\]
+\end{definition}
+
+
+\begin{definition}
 \lean{WeightedGraph.L}
 \label{def:L}
 \leanok
@@ -50,7 +96,7 @@ L(u,v)=
 
 
 
-\begin{definition}
+\begin{definition} [Laplacian Matrix]
 \lean{WeightedGraph.Laplacian}
 \label{def:Laplacian}
 \leanok
@@ -81,6 +127,7 @@ Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$.
 \lean{WeightedGraph.Lap_symmetric_normalization}
 \label{thm:Lap_symmetric_normalization}
 \uses{def:T_inv_sqrt, def:Laplacian, def:L}
+\leanok
 \[
 \mathcal{L} = T^{-1/2} \text{ } L \text{ } T^{-1/2}
 \]
@@ -89,4 +136,59 @@ Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$.
 
 \begin{proof}
 @Grok is this true?
+\end{proof}
+
+
+
+\begin{definition}
+\lean{WeightedGraph.LapOperator}
+\label{def:LapOperator}
+\leanok
+The Laplacian of a graph can be viewed as an operator on the space of functions $g : V(G) \rightarrow \mathbb{R}$.
+\end{definition}
+
+
+\begin{definition}
+\lean{WeightedGraph.LapOperatorFormula}
+\label{def:LapOpFormula}
+\uses{def:LapOperator}
+The Laplacian Operator satisfies
+\[
+\mathcal{L}g(u) = \frac{1}{\sqrt{d_u}} \sum_{\substack{v \\ u \sim v}} \left( \frac{g(u)}{\sqrt{d_u}} - \frac{g(v)}{\sqrt{d_v}} \right).
+\]
+\end{definition}
+
+
+
+\begin{theorem}
+\lean{WeightedGraph.LapOfRegGraph}
+\label{thm:LapOfRegGraph}
+\uses{def:LapOperator, def:Adjacency, def:IsRegularOfDegree}
+When $G$ is $k$-regular,
+\[
+\mathcal{L} = I - \frac{1}{k} A,
+\]  
+\end{theorem}
+where $A$ is the adjacency matrix of $G$, and $I$ is the identity matrix.
+
+\begin{proof}
+By magic.
+\end{proof}
+
+
+
+\begin{theorem}
+\lean{WeightedGraph.LapOfNotIsolatedGraph}
+\label{thm:LapOfNotIsolatedGraph}
+\uses{def:IsIsolated, thm:Lap_symmetric_normalization, thm:LapOfRegGraph}
+For a general graph without isolated vertices, we have
+\[
+\begin{aligned}
+\mathcal{L} = I - T^{-1/2} A T^{-1/2}.
+\end{aligned}
+\]
+\end{theorem}
+
+\begin{proof}
+TODO: write the proofs.
 \end{proof}

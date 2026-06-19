@@ -71,7 +71,7 @@ def T_inv_sqrt : Matrix α α ℝ :=
   Matrix.diagonal (fun v => if G.degree v = 0 then 0 else 1 / Real.sqrt (G.degree v))
 
 
-/-- `Lap = T_inv_sqrt * L * T_inv_sqrt` -/
+/-- `Laplacian = T_inv_sqrt * L * T_inv_sqrt` -/
 lemma Lap_symmetric_normalization : G.Laplacian = G.T_inv_sqrt * G.L * G.T_inv_sqrt := by
   ext u v;
   unfold Laplacian L T_inv_sqrt;
@@ -82,10 +82,11 @@ lemma Lap_symmetric_normalization : G.Laplacian = G.T_inv_sqrt * G.L * G.T_inv_s
 
 
 /-- We say v is an isolated vertex if dᵥ = 0. -/
-def IsIsolated (v : α) := G.degree v = 0
+def IsIsolated (v : G.vertexSet) := G.degree v = 0
+
 
 /-- A graph is said to be nontrivial if it contains at least one edge. -/
-def Nontrivial (G : Graph α β) := G.edgeSet ≠ ∅
+def NonTrivial (G : Graph α β) := G.edgeSet ≠ ∅
 
 
 /-- The Laplacian can be viewed as an operator on
@@ -97,18 +98,16 @@ def LapOperator (g : α → ℝ) : α → ℝ := G.Laplacian.mulVec g
 def IsSimple : Prop := ∀ u, (G.degree u : ℝ) = ({v | G.Adj u v}).ncard
 
 
-/-- The Laplacian Operator satisfies *big equation page 3* -/
+/-- The Laplacian Operator satisfies *big equation page 3*. -/
 lemma LapOperatorFormula (hS : G.IsSimple) : G.LapOperator =
-  fun g u =>
-    (1 / Real.sqrt (G.degree u)) *
-      ∑ v : α, if G.Adj u v then
-          g u / Real.sqrt (G.degree u) - g v / Real.sqrt (G.degree v)
-        else 0 := by sorry
+  fun g u => (1 / Real.sqrt (G.degree u)) * ∑ v : α, if G.Adj u v then
+      g u / Real.sqrt (G.degree u) - g v / Real.sqrt (G.degree v) else 0 := sorry
+
 
 
 /-- A graph is regular of degree `d` if every vertex has degree `d`. -/
-def IsRegularOfDegree (d : ℕ) : Prop :=
-  ∀ v, G.degree v = d
+def IsRegularOfDegree (k : ℕ) : Prop :=
+  ∀ v, G.degree v = k
 
 
 /-- Adjacency Matrix: `A(u, v) = 1` if `u` is adjacent to `v`, and `0` otherwise. -/
@@ -129,9 +128,9 @@ lemma LapOfRegGraph {k : ℕ} : G.IsRegularOfDegree k →
 def NoIsolation := ∀ v : G.vertexSet, ¬ (G.IsIsolated v)
 
 
-/-- The normalized Laplacian matrix of a graph without
-isolated vertices is equal to `L = I - T^(-1/2) * A * T^(-1/2)`. -/
-lemma TodoFindName : G.NoIsolation →
+/-- For a graph without isolated vertices, we have
+`Laplacian = Identity - T_inv_sqrt * Adjacency * T_inv_sqrt`. -/
+lemma LapOfNotIsolatedGraph : G.NoIsolation →
   G.Laplacian = Identity - G.T_inv_sqrt * G.Adjacency * G.T_inv_sqrt := sorry
 
 
@@ -140,6 +139,7 @@ are indexed by the edges of G. Each column corresponding to an edgec`e = {u, v}`
 has an entry `1/√dᵤ` in the row corresponding to `u`, an entry `−1/√dᵥ` in
 the row corresponding to `v`, and has zero entries elsewhere. -/
 def BoundaryOperator : Matrix α β ℝ := sorry
+
 
 
 /-- also add G in the statement -/
