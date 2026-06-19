@@ -118,10 +118,18 @@ def Adjacency : Matrix α α ℝ :=
 abbrev Identity := (1 : Matrix α α ℝ)
 
 
-/-- When G is k-regular, it is easy to see that `L = I − 1/k * A` -/
-lemma LapOfRegGraph {k : ℕ} : G.IsRegularOfDegree k →
-  G.Laplacian = Identity - (1 / (k : ℝ)) • G.Adjacency := by
-  sorry
+omit [Fintype α] in
+/-- For a loopless, `k`-regular graph,
+`Laplacian = Identity − 1/k * Adjacency` -/
+lemma LapOfRegGraph {k : ℕ+} (hLoopless : ∀ v, ¬ G.Adj v v) :
+    G.IsRegularOfDegree k →
+    G.Laplacian = Identity - (1 / (k : ℝ)) • G.Adjacency := by
+  intro hReg; ext u v;
+  unfold IsRegularOfDegree at hReg;
+  have hDu : G.degree u = k := hReg u;
+  have hDv : G.degree v = k := hReg v;
+  unfold Laplacian Adjacency Identity;
+  split_ifs <;> simp_all; ring;
 
 
 /-- We say that a graph has no isolation when none of its vertices is isolated. -/
