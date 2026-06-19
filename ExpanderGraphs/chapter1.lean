@@ -22,6 +22,7 @@ public import Mathlib.Algebra.Order.Archimedean.Real.Basic
 * [Spectral Graph Theory, Fan Chung][Chung]
 -/
 
+set_option linter.unusedSectionVars false
 set_option linter.unusedFintypeInType false
 
 @[expose] public section
@@ -33,13 +34,14 @@ open NNReal
 @[ext]
 structure WeightedGraph (α β : Type*) extends Graph α β where
   edgeWeight : β → ℝ≥0
-  /-- An edge weight is greater than 0 if and only if it belongs to the edge set of the graph. -/
   edgeDef (e : β) : e ∈ edgeSet ↔ 0 < edgeWeight e
+  orientation : β → α
 
-variable {α β : Type*} [DecidableEq α] [Fintype α]
+variable {α β : Type*} [DecidableEq α] [Fintype α] [Fintype β]
 variable {G : WeightedGraph α β}
 variable [DecidableRel G.Adj]
-variable (hUniv : G.vertexSet = Set.univ)
+variable (hα : G.vertexSet = Set.univ)
+variable (hβ : G.edgeSet = Set.univ)
 
 
 namespace WeightedGraph
@@ -64,12 +66,12 @@ def L : Matrix α α ℝ :=
 def Laplacian : Matrix α α ℝ :=
   fun (u v : α) =>
     if u = v then if G.degree v = 0 then 0 else 1
-    else if G.Adj u v then -1 / Real.sqrt (G.degree v * G.degree u)
+    else if G.Adj u v then -1 / √ (G.degree v * G.degree u)
     else 0
 
 
 def T_inv_sqrt : Matrix α α ℝ :=
-  Matrix.diagonal (fun v => if G.degree v = 0 then 0 else 1 / Real.sqrt (G.degree v))
+  Matrix.diagonal (fun v => if G.degree v = 0 then 0 else 1 / √ (G.degree v))
 
 
 /-- `Laplacian = T_inv_sqrt * L * T_inv_sqrt` -/
@@ -101,8 +103,8 @@ def IsSimple : Prop := ∀ u, (G.degree u : ℝ) = ({v | G.Adj u v}).ncard
 
 /-- The Laplacian Operator satisfies *big equation page 3*. -/
 lemma LapOperatorFormula (hS : G.IsSimple) : G.LapOperator =
-  fun g u => (1 / Real.sqrt (G.degree u)) * ∑ v : α, if G.Adj u v then
-      g u / Real.sqrt (G.degree u) - g v / Real.sqrt (G.degree v) else 0 := sorry
+  fun g u => (1 / √ (G.degree u)) * ∑ v : α, if G.Adj u v then
+      g u / √ (G.degree u) - g v / √ (G.degree v) else 0 := sorry
 
 
 
@@ -137,29 +139,38 @@ def NoIsolation := ∀ v : G.vertexSet, ¬ (G.IsIsolated v)
 
 
 
-include hUniv in
+include hα in
 /-- For a graph without isolated vertices, we have
 `Laplacian = Identity - T_inv_sqrt * Adjacency * T_inv_sqrt`. -/
 lemma LapOfNotIsolatedGraph (hLoopless : ∀ v, ¬ G.Adj v v) : G.NoIsolation →
   G.Laplacian = Identity - G.T_inv_sqrt * G.Adjacency * G.T_inv_sqrt := by
   intro hIso; ext u v;
-  have hDu : G.degree u ≠ 0 := hIso ⟨u, by simp [hUniv]⟩
-  have hDv : G.degree v ≠ 0 := hIso ⟨v, by simp [hUniv]⟩
+  have hDu : G.degree u ≠ 0 := hIso ⟨u, by simp [hα]⟩
+  have hDv : G.degree v ≠ 0 := hIso ⟨v, by simp [hα]⟩
   unfold Laplacian Adjacency Identity T_inv_sqrt;
   split_ifs <;> simp_all +decide [div_eq_mul_inv];
 
 
 
+section BoundaryOperator
+
+variable [DecidableRel G.Inc]
+
 /-- `S` is the matrix whose rows are indexed by the vertices and whose columns
 are indexed by the edges of G. Each column corresponding to an edgec`e = {u, v}`
 has an entry `1/√dᵤ` in the row corresponding to `u`, an entry `−1/√dᵥ` in
 the row corresponding to `v`, and has zero entries elsewhere. -/
-def BoundaryOperator : Matrix α β ℝ := sorry
+def S : Matrix α β ℝ :=
+  fun u e => if (G.Inc e u) then
+    if G.orientation e = u then 1 / √ (G.degree u) else - 1 / √ (G.degree u)
+    else 0
 
 
+/-- `Laplacian = S * Sᵀ` -/
+lemma LSS : G.Laplacian = G.S * (G.S)ᵀ := sorry
 
-/-- also add G in the statement -/
-lemma LSS : G.Laplacian = BoundaryOperator * (BoundaryOperator)ᵀ := sorry
+
+end BoundaryOperator
 
 
 omit [Fintype α] in

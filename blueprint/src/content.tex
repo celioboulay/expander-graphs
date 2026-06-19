@@ -21,6 +21,9 @@ with the condition that
 e \in edgeSet \iff 0 < w(e)
 \]
 
+
+We also add an arbitray orientation for undirected edges.
+
 \end{definition}
 
 
@@ -194,3 +197,29 @@ For a general graph without isolated vertices, we have
 \begin{proof}
 TODO: write the proofs.
 \end{proof}
+
+
+
+\begin{definition}[Boundary Operator]
+\lean{WeightedGraph.S}
+\label{def:S}
+\uses{def:degree}
+\leanok
+Let $S$ denote the matrix whose rows are indexed by the vertices and whose columns
+are indexed by the edges of G. Each column corresponding to an edge $e = \{u, v\}$
+has an entry $1/\sqrt{d_u}$ in the row corresponding to $u$, an entry $−1/\sqrt{d_v}$ in
+the row corresponding to $v$, and has zero entries elsewhere.
+\end{definition}
+
+
+
+\begin{theorem}
+\label{thm:LSS}
+\lean{WeightedGraph.LSS}
+\uses{def:LapOperator, def:S}
+We note that $\mathcal{L}$ can be written as
+\[
+\mathcal{L} = SS^*.
+\]
+\end{theorem}
+
