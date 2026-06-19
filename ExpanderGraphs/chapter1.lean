@@ -88,15 +88,22 @@ def IsIsolated (v : α) := G.degree v = 0
 def Nontrivial (G : Graph α β) := G.edgeSet ≠ ∅
 
 
-/-- The Laplacian can be viewed as an operator on the space of functions g :
-V(G) → R which satisfies *big equation page 3* -/
-def LapOperator : (α → ℝ) → (α → ℝ) :=
-  fun (g : α → ℝ) =>
-    fun (u : α) =>
-      ∑ v : α, if G.Adj u v then
-              (g u / Real.sqrt (G.degree u) - g v / Real.sqrt (G.degree v))
-            else 0
+/-- The Laplacian can be viewed as an operator on
+the space of functions g : V(G) → R. -/
+def LapOperator (g : α → ℝ) : α → ℝ := G.Laplacian.mulVec g
 
+
+/-- No multiple loops -/
+def IsSimple : Prop := ∀ u, (G.degree u : ℝ) = ({v | G.Adj u v}).ncard
+
+
+/-- The Laplacian Operator satisfies *big equation page 3* -/
+lemma LapOperatorFormula (hS : G.IsSimple) : G.LapOperator =
+  fun g u =>
+    (1 / Real.sqrt (G.degree u)) *
+      ∑ v : α, if G.Adj u v then
+          g u / Real.sqrt (G.degree u) - g v / Real.sqrt (G.degree v)
+        else 0 := by sorry
 
 
 /-- A graph is regular of degree `d` if every vertex has degree `d`. -/
