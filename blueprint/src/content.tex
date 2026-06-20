@@ -2,6 +2,7 @@
 
 This blueprint follows Fan Chung: Spectral Graph Theory (first published: AMS, 1992).\\
 Unless otherwise specified, all matrices are $n \times n$ where $n$ is the number of vertices in $G$.
+We omit natural language proofs for theorems that only involve matrix multiplication and basic operations, although we formally prove them in Lean.
 
 \section{Weighted Graph}
 
@@ -20,7 +21,6 @@ with the condition that
 \[
 e \in edgeSet \iff 0 < w(e)
 \]
-
 
 We also add an arbitray orientation for undirected edges.
 
@@ -98,7 +98,6 @@ L(u,v)=
 
 
 
-
 \begin{definition} [Laplacian Matrix]
 \lean{WeightedGraph.Laplacian}
 \label{def:Laplacian}
@@ -137,11 +136,6 @@ Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$.
 \end{theorem}
 
 
-\begin{proof}
-@Grok is this true?
-\end{proof}
-
-
 
 \begin{definition}
 \lean{WeightedGraph.LapOperator}
@@ -166,7 +160,7 @@ The Laplacian Operator satisfies
 \begin{theorem}
 \lean{WeightedGraph.LapOfRegGraph}
 \label{thm:LapOfRegGraph}
-\uses{def:LapOperator, def:Adjacency, def:IsRegularOfDegree}
+\uses{def:Laplacian, def:Adjacency, def:IsRegularOfDegree}
 \leanok
 When $G$ is $k$-regular,
 \[
@@ -175,16 +169,12 @@ When $G$ is $k$-regular,
 \end{theorem}
 where $k > 0$, $A$ is the adjacency matrix of $G$, and $I$ is the identity matrix.
 
-\begin{proof}
-By magic.
-\end{proof}
-
 
 
 \begin{theorem}
 \lean{WeightedGraph.LapOfNotIsolatedGraph}
 \label{thm:LapOfNotIsolatedGraph}
-\uses{def:IsIsolated, thm:Lap_symmetric_normalization, thm:LapOfRegGraph}
+\uses{def:IsIsolated, thm:LapOfRegGraph}
 \leanok
 For a general graph without isolated vertices, we have
 \[
@@ -193,11 +183,6 @@ For a general graph without isolated vertices, we have
 \end{aligned}
 \]
 \end{theorem}
-
-\begin{proof}
-TODO: write the proofs.
-\end{proof}
-
 
 
 \begin{definition}[Boundary Operator]
@@ -216,10 +201,43 @@ the row corresponding to $v$, and has zero entries elsewhere.
 \begin{theorem}
 \label{thm:LSS}
 \lean{WeightedGraph.LSS}
-\uses{def:LapOperator, def:S}
+\uses{def:Laplacian, def:S}
 We note that $\mathcal{L}$ can be written as
 \[
 \mathcal{L} = SS^*.
 \]
 \end{theorem}
 
+
+
+\begin{theorem}
+\lean{WeightedGraph.LapHermitian}
+\label{thm:LapHermitian}
+\uses{def:Laplacian}
+\leanok
+The Matrix $\mathcal{L}$ is hermitian.
+\end{theorem}
+
+\begin{proof}
+By spectral theorem.
+\end{proof}
+
+
+
+\begin{definition}
+\lean{WeightedGraph.lapEigvals}
+\label{def:lapEigvals}
+\uses{thm:LapHermitian}
+\leanok
+Following \ref{thm:LapHermitian}, the eigenvalues of $\mathcal{L}$ are all real and non-negative.
+\end{definition}
+
+
+
+\begin{definition}
+\lean{WeightedGraph.Volume}
+\label{def:Volume}
+\uses{def:degree}
+\leanok
+The volume of a graph is defined as the sum of the degrees of its vertices.
+\end{definition}

@@ -31,7 +31,6 @@ set_option linter.unusedFintypeInType false
 open NNReal
 
 
-@[ext]
 structure WeightedGraph (α β : Type*) extends Graph α β where
   edgeWeight : β → ℝ≥0
   edgeDef (e : β) : e ∈ edgeSet ↔ 0 < edgeWeight e
@@ -169,8 +168,11 @@ def S : Matrix α β ℝ :=
 /-- `Laplacian = S * Sᵀ` -/
 lemma LSS : G.Laplacian = G.S * (G.S)ᵀ := sorry
 
-
 end BoundaryOperator
+
+
+
+section Spectral
 
 
 omit [Fintype α] in
@@ -188,7 +190,7 @@ lemma LapHermitian : G.Laplacian.IsHermitian := by
 
 
 /-- Eigenvalues of the Laplacian Matrix in non-increasing order. -/
-def adjEigvals : Fin (Fintype.card α) → ℝ :=
+def lapEigvals : Fin (Fintype.card α) → ℝ :=
   Matrix.IsHermitian.eigenvalues₀ G.LapHermitian
 
 
@@ -197,7 +199,6 @@ def Volume : ℝ≥0 := ∑ v : α, G.degree v
 
 
 /-- Complete Graph `Kₙ` on `n` vertices. -/
-@[ext]
 structure CompleteGraph (α β : Type*) extends WeightedGraph α β where
   completeness : ∀ (x y : vertexSet), x ≠ y ↔ ∃! e : edgeSet, IsLink e x y
 
@@ -219,6 +220,7 @@ lemma zero_mem_complete_graph_spectrum (K : CompleteGraph α β) [DecidableRel K
     0 ∈ lapSpectrum K.toWeightedGraph := sorry
 
 
+end Spectral
 
 end
 
