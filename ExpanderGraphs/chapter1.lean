@@ -14,6 +14,7 @@ public import Mathlib.Analysis.Matrix.Spectrum
 public import Mathlib.Combinatorics.Graph.Basic
 public import Mathlib.LinearAlgebra.Matrix.Symmetric
 public import Mathlib.Algebra.Order.Archimedean.Real.Basic
+public import Mathlib.Analysis.InnerProductSpace.Rayleigh
 
 /-!
 # Formalization of the book's content
@@ -52,6 +53,18 @@ def degree (v : α) : ℝ≥0 :=
   (G.incidenceSet v).ncard
 
 
+/-- The volume of a graph is defined as the sum of the degrees of its vertices -/
+def Volume : ℝ≥0 := ∑ v : α, G.degree v
+
+
+/-- We say v is an isolated vertex if dᵥ = 0. -/
+def IsIsolated (v : G.vertexSet) := G.degree v = 0
+
+
+/-- A graph is said to be nontrivial if it contains at least one edge. -/
+def NonTrivial (G : Graph α β) := G.edgeSet ≠ ∅
+
+
 open Matrix
 
 
@@ -83,17 +96,11 @@ lemma Lap_symmetric_normalization : G.Laplacian = G.T_inv_sqrt * G.L * G.T_inv_s
   · by_cases hu : G.degree u = 0 <;> by_cases hv : G.degree v = 0 <;> simp_all +decide [degree]
 
 
-/-- We say v is an isolated vertex if dᵥ = 0. -/
-def IsIsolated (v : G.vertexSet) := G.degree v = 0
-
-
-/-- A graph is said to be nontrivial if it contains at least one edge. -/
-def NonTrivial (G : Graph α β) := G.edgeSet ≠ ∅
-
 
 /-- The Laplacian can be viewed as an operator on
 the space of functions g : V(G) → R. -/
-def LapOperator (g : α → ℝ) : α → ℝ := G.Laplacian.mulVec g
+def LapOperator : (α → ℝ) →L[ℝ] (α → ℝ) :=
+  (toLin' G.Laplacian).toContinuousLinearMap
 
 
 /-- No multiple loops -/
@@ -101,15 +108,14 @@ def IsSimple : Prop := ∀ u, (G.degree u : ℝ) = ({v | G.Adj u v}).ncard
 
 
 /-- The Laplacian Operator satisfies *big equation page 3*. -/
-lemma LapOperatorFormula (hS : G.IsSimple) : G.LapOperator =
+lemma LapOperatorFormula (hS : G.IsSimple) : ⇑G.LapOperator =
   fun g u => (1 / √ (G.degree u)) * ∑ v : α, if G.Adj u v then
       g u / √ (G.degree u) - g v / √ (G.degree v) else 0 := sorry
 
 
 
 /-- A graph is regular of degree `d` if every vertex has degree `d`. -/
-def IsRegularOfDegree (k : ℕ) : Prop :=
-  ∀ v, G.degree v = k
+def IsRegularOfDegree (k : ℕ) := ∀ v, G.degree v = k
 
 
 /-- Adjacency Matrix: `A(u, v) = 1` if `u` is adjacent to `v`, and `0` otherwise. -/
@@ -194,13 +200,23 @@ def lapEigvals : Fin (Fintype.card α) → ℝ :=
   Matrix.IsHermitian.eigenvalues₀ G.LapHermitian
 
 
-/-- The volume of a graph is defined as the sum of the degrees of its vertices -/
-def Volume : ℝ≥0 := ∑ v : α, G.degree v
+
+section Rayleigh
+
+open ContinuousLinearMap
+
+variable {g : α → ℝ}
+
+/-- The Dirichlet sum of a graph `G` is the sum of `(f(u) - f(v))²`
+over all unordered pairs `{u, v}` for which `u` and `v` are adjacent. -/
+def DirichletSum (f : α → ℝ) : ℝ :=
+  ∑ u : α, ∑ v : α, if G.Adj u v then (f u - f v)^2 else 0
 
 
-/-- Complete Graph `Kₙ` on `n` vertices. -/
-structure CompleteGraph (α β : Type*) extends WeightedGraph α β where
-  completeness : ∀ (x y : vertexSet), x ≠ y ↔ ∃! e : edgeSet, IsLink e x y
+
+--lemma eigen_rayleigh : G.LapOperator.rayleighQuotient = todo := sorry
+
+end Rayleigh
 
 
 /-- The spectrum of a graph -/
@@ -208,10 +224,26 @@ def lapSpectrum (G : WeightedGraph α β) [DecidableRel G.Adj] : Set ℝ :=
   spectrum ℝ G.Laplacian
 
 
+/-- `τ` denote the constant function which assigns the value `1` on each vertex -/
+abbrev τ : α → ℝ := fun _ => 1 -- may change name from τ to smth else though
+
+
+/-- `T_inv_sqrt * τ` is an eigenfunction of `Laplacian` with eigenvalue `0`. -/
+theorem zero_eigenvalue_normalized :
+  G.Laplacian.mulVec (G.T_inv_sqrt.mulVec τ) = 0 := by
+  sorry
+
+
+section CompleteGraph
+
+/-- Complete Graph `Kₙ` on `n` vertices. -/
+structure CompleteGraph (α β : Type*) extends WeightedGraph α β where
+  completeness : ∀ (x y : vertexSet), x ≠ y ↔ ∃! e : edgeSet, IsLink e x y
+
+
 /-- `0` is an eigenvalue of the Laplacian of a graph. -/
 theorem zero_mem_spectrum_lapMatrix (K : CompleteGraph α β) [DecidableRel K.Adj] :
     0 ∈ lapSpectrum K.toWeightedGraph := sorry
-
 
 
 /-- For the complete graph `Kₙ` on `n` vertices, the eigenvalues
@@ -219,6 +251,8 @@ are `0` and `n/(n − 1)` (with multiplicity `n − 1`). -/
 lemma zero_mem_complete_graph_spectrum (K : CompleteGraph α β) [DecidableRel K.Adj] :
     0 ∈ lapSpectrum K.toWeightedGraph := sorry
 
+
+end CompleteGraph
 
 end Spectral
 
