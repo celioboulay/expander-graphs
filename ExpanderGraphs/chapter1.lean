@@ -54,6 +54,10 @@ def degree (v : α) : ℝ≥0 :=
   (G.incidenceSet v).ncard
 
 
+/-- A graph is regular of degree `d` if every vertex has degree `d`. -/
+def IsRegularOfDegree (k : ℕ) := ∀ v, G.degree v = k
+
+
 /-- The volume of a graph is defined as the sum of the degrees of its vertices -/
 def Volume : ℝ≥0 := ∑ v : α, G.degree v
 
@@ -142,11 +146,6 @@ def IsSimple : Prop := ∀ u, (G.degree u : ℝ) = ({v | G.Adj u v}).ncard
 lemma LapOperatorFormula (hS : G.IsSimple) : ⇑G.LapOperator =
   fun g u => (1 / √ (G.degree u)) * ∑ v : α, if G.Adj u v then
       g u / √ (G.degree u) - g v / √ (G.degree v) else 0 := sorry
-
-
-
-/-- A graph is regular of degree `d` if every vertex has degree `d`. -/
-def IsRegularOfDegree (k : ℕ) := ∀ v, G.degree v = k
 
 
 /-- Adjacency Matrix: `A(u, v) = 1` if `u` is adjacent to `v`, and `0` otherwise. -/
@@ -260,26 +259,49 @@ abbrev τ : α → ℝ := fun _ => 1 -- may change name from τ to smth else tho
 
 
 /-- `T_sqrt * τ` is an eigenfunction of `Laplacian` with eigenvalue `0`. -/
-theorem zero_eigenvalue_normalized :
+theorem zero_eigenvalue_normalized (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Adj v v) :
   G.Laplacian.mulVec (G.T_sqrt.mulVec τ) = 0 := by
   unfold T_sqrt τ;
   ext v; simp;
   rw [mulVec, dotProduct]; simp;
   unfold Laplacian; simp;
   by_cases h_deg : G.degree v = 0
-  · have hnv : ∀ x : α, ¬ G.Adj x v := by
-      by_contra hF; push Not at hF; sorry
+  · simp [h_deg];
+  · push Not at h_deg;
+    simp +decide [Finset.sum_ite, Finset.filter_eq, Finset.filter_ne,
+      Finset.filter_erase, Finset.filter_singleton,
+      h_deg, div_eq_mul_inv, mul_comm, mul_left_comm];
+    have hz : ∀ x ∈ {x | G.Adj v x}, (G.degree x) ≠ 0 := sorry
+    field_simp;
+    refine Eq.symm (eq_add_neg_of_add_eq ?_); ring_nf;
+
+    -- if adj v x then degree x non nul
+    -- √dᵥ - √dᵥ = 0
+
+
     sorry
-  · sorry
-
-
 
 
 section CompleteGraph
 
 /-- Complete Graph `Kₙ` on `n` vertices. -/
 structure CompleteGraph (α β : Type*) extends WeightedGraph α β where
-  completeness : ∀ (x y : vertexSet), x ≠ y ↔ ∃! e : edgeSet, IsLink e x y
+  completeness : ∀ (x y : α), x ≠ y ↔ ∃ e : edgeSet, IsLink e x y
+
+
+variable {K : CompleteGraph α β}
+
+-- add subsequent lemmas such as loopless et. al. (for Complete Graph)
+-- may use G.loopSet x in the following
+lemma complete_graph_loopless : ∀ v, ¬ K.Adj v v := by
+  by_contra h; push Not at h;
+  obtain ⟨v, hv⟩ := h
+  -- have h_iff := K.completeness v v;
+
+  sorry
+
+
+
 
 
 /-- `0` is an eigenvalue of the Laplacian of a graph. -/
