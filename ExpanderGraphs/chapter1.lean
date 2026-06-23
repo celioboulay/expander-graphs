@@ -25,6 +25,7 @@ public import Mathlib.Analysis.InnerProductSpace.Rayleigh
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedFintypeInType false
+set_option linter.unusedDecidableInType false
 
 @[expose] public section
 
@@ -61,6 +62,32 @@ def Volume : ℝ≥0 := ∑ v : α, G.degree v
 def IsIsolated (v : G.vertexSet) := G.degree v = 0
 
 
+/-- A vertex has degree 0 iff it has no adjacent vertex. -/
+lemma no_adj_iff_zero_degree (v : α) : G.degree v = 0 ↔ ∀ u : α, ¬ G.Adj u v := by
+  constructor
+  · intro h;
+    by_contra hF; push Not at hF;
+    obtain ⟨u, hu⟩ := hF
+    have hE : ∃ (e : β), G.IsLink e u v := by trivial
+    obtain ⟨e, he⟩ := hE
+    have hev : G.Inc e v := Graph.IsLink.inc_right he
+    have hes : e ∈ G.incidenceSet v := by rw [Graph.mem_incidenceSet]; exact hev;
+    unfold degree at h; norm_cast at h;
+    rw [Set.ncard_eq_zero] at h;
+    rw [h] at hes; exact hes;
+  · intro h;
+    unfold degree; norm_cast; rw [Set.ncard_eq_zero]
+    by_contra hF; push Not at hF;
+    obtain ⟨e, he⟩ := hF;
+    have hev : G.Inc e v := he;
+    have hu : ∃ (u : α), G.IsLink e v u := by trivial
+    obtain ⟨u, hL⟩ := hu;
+    have hAdj : G.Adj v u := by exact Graph.IsLink.adj hL;
+    rw [Graph.adj_comm] at hAdj; grind;
+
+
+
+
 /-- A graph is said to be nontrivial if it contains at least one edge. -/
 def NonTrivial (G : Graph α β) := G.edgeSet ≠ ∅
 
@@ -80,6 +107,10 @@ def Laplacian : Matrix α α ℝ :=
     if u = v then if G.degree v = 0 then 0 else 1
     else if G.Adj u v then -1 / √ (G.degree v * G.degree u)
     else 0
+
+
+def T_sqrt : Matrix α α ℝ :=
+  Matrix.diagonal (fun v => √ (G.degree v))
 
 
 def T_inv_sqrt : Matrix α α ℝ :=
@@ -228,10 +259,20 @@ def lapSpectrum (G : WeightedGraph α β) [DecidableRel G.Adj] : Set ℝ :=
 abbrev τ : α → ℝ := fun _ => 1 -- may change name from τ to smth else though
 
 
-/-- `T_inv_sqrt * τ` is an eigenfunction of `Laplacian` with eigenvalue `0`. -/
+/-- `T_sqrt * τ` is an eigenfunction of `Laplacian` with eigenvalue `0`. -/
 theorem zero_eigenvalue_normalized :
-  G.Laplacian.mulVec (G.T_inv_sqrt.mulVec τ) = 0 := by
-  sorry
+  G.Laplacian.mulVec (G.T_sqrt.mulVec τ) = 0 := by
+  unfold T_sqrt τ;
+  ext v; simp;
+  rw [mulVec, dotProduct]; simp;
+  unfold Laplacian; simp;
+  by_cases h_deg : G.degree v = 0
+  · have hnv : ∀ x : α, ¬ G.Adj x v := by
+      by_contra hF; push Not at hF; sorry
+    sorry
+  · sorry
+
+
 
 
 section CompleteGraph
