@@ -355,25 +355,34 @@ end CompleteGraph
 variable {n : ℕ} (hn : n = Nat.card G.vertexSet)
 
 include hα hn in
+lemma lapEigvals_sum_eq_trace :
+  ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = G.Laplacian.trace := by
+  rw [G.LapHermitian.trace_eq_sum_eigenvalues,
+    ← Equiv.sum_comp (Fintype.equivOfCardEq (Fintype.card_fin _)).symm]
+  rfl
+
+
+include hα hn in
 /-- For graph `G` on `n` vertices, the sum of its eigenvalues it at most `n`. -/
 lemma eigval_sum_le_n : ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i ≤ n := by
-  have h_trace : ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = G.Laplacian.trace := by
-    rw [G.LapHermitian.trace_eq_sum_eigenvalues,
-      ← Equiv.sum_comp (Fintype.equivOfCardEq (Fintype.card_fin _)).symm]; rfl
   have hn' : (n : ℝ) = Fintype.card α := by rw [hn, hα]; simp
-  rw [h_trace, hn']; unfold trace diag Laplacian
-  refine le_trans (Finset.sum_le_sum (g := fun _ => (1 : ℝ)) ?_) (by simp)
-  grind;
+  rw [G.lapEigvals_sum_eq_trace hα hn, hn'];
+  unfold trace diag Laplacian;
+  refine le_trans (Finset.sum_le_sum (g := fun _ => (1 : ℝ)) ?_) (by simp);
+  grind
 
 
-
+include hα hn in
 /-- The equality in `eigval_sum_le_n` holds iff G has `NoIsolation`. -/
 lemma eigval_sum_eq_n_iff_no_isolation (h : G.NoIsolation) :
-  ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = n := sorry
-
-
-
-
+  ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = n := by
+  have hn' : (n : ℝ) = Fintype.card α := by rw [hn, hα]; simp;
+  rw [G.lapEigvals_sum_eq_trace hα hn, hn'];
+  unfold trace diag Laplacian;
+  unfold NoIsolation IsIsolated at h;
+  simp only [Subtype.forall] at h;
+  have hx : ∀ x : α, ¬G.degree x = 0 := by grind;
+  simp [hx];
 
 
 end Spectral
