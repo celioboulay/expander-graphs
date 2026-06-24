@@ -227,9 +227,8 @@ lemma LapHermitian : G.Laplacian.IsHermitian := by
 
 
 /-- Eigenvalues of the Laplacian Matrix in non-increasing order. -/
-def lapEigvals : Fin (Fintype.card α) → ℝ :=
-  Matrix.IsHermitian.eigenvalues₀ G.LapHermitian
-
+def lapEigvals (h : G.Laplacian.IsHermitian) : Fin (Fintype.card α) → ℝ :=
+  Matrix.IsHermitian.eigenvalues₀ h
 
 
 section Rayleigh
@@ -333,11 +332,7 @@ lemma complete_graph_loopless : ∀ v, ¬ K.Adj v v := by
   by_contra h; push Not at h;
   obtain ⟨v, hv⟩ := h
   -- have h_iff := K.completeness v v;
-
   sorry
-
-
-
 
 
 /-- `0` is an eigenvalue of the Laplacian of a graph. -/
@@ -352,6 +347,34 @@ lemma zero_mem_complete_graph_spectrum (K : CompleteGraph α β) [DecidableRel K
 
 
 end CompleteGraph
+
+
+-- ============= Skip to Section 1.3 for now ============= --
+-- 1.3 Basic facts about the spectrum of a graph
+
+variable {n : ℕ} (hn : n = Nat.card G.vertexSet)
+
+include hα hn in
+/-- For graph `G` on `n` vertices, the sum of its eigenvalues it at most `n`. -/
+lemma eigval_sum_le_n : ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i ≤ n := by
+  have h_trace : ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = G.Laplacian.trace := by
+    rw [G.LapHermitian.trace_eq_sum_eigenvalues,
+      ← Equiv.sum_comp (Fintype.equivOfCardEq (Fintype.card_fin _)).symm]; rfl
+  have hn' : (n : ℝ) = Fintype.card α := by rw [hn, hα]; simp
+  rw [h_trace, hn']; unfold trace diag Laplacian
+  refine le_trans (Finset.sum_le_sum (g := fun _ => (1 : ℝ)) ?_) (by simp)
+  grind;
+
+
+
+/-- The equality in `eigval_sum_le_n` holds iff G has `NoIsolation`. -/
+lemma eigval_sum_eq_n_iff_no_isolation (h : G.NoIsolation) :
+  ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = n := sorry
+
+
+
+
+
 
 end Spectral
 
