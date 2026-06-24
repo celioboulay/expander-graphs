@@ -23,6 +23,7 @@ public import Mathlib.Analysis.InnerProductSpace.Rayleigh
 * [Spectral Graph Theory, Fan Chung][Chung]
 -/
 
+set_option linter.style.emptyLine false
 set_option linter.unusedSectionVars false
 set_option linter.unusedFintypeInType false
 set_option linter.unusedDecidableInType false
@@ -258,6 +259,27 @@ def lapSpectrum (G : WeightedGraph α β) [DecidableRel G.Adj] : Set ℝ :=
 abbrev τ : α → ℝ := fun _ => 1 -- may change name from τ to smth else though
 
 
+
+lemma card_of_adj_loopless (v : α) (hS : G.IsSimple) :
+   {x | G.Adj v x}.ncard = G.degree v := by
+  exact_mod_cast (hS v).symm
+
+
+
+lemma adj_degree_neq_zero (u v : α) (hAdj : G.Adj u v) :
+  G.degree u ≠ 0 ∧ G.degree v ≠ 0 := by
+    have hE : ∃ (e : β), G.IsLink e u v := by trivial
+    obtain ⟨e, he⟩ := hE;
+    constructor
+    · have heu : G.Inc e u := Graph.IsLink.inc_left he
+      have hes : e ∈ G.incidenceSet u := by rw [Graph.mem_incidenceSet]; exact heu;
+      unfold degree; by_contra h; norm_cast at h; rw [Set.ncard_eq_zero] at h; grind
+    · have hev : G.Inc e v := Graph.IsLink.inc_right he
+      have hes : e ∈ G.incidenceSet v := by rw [Graph.mem_incidenceSet]; exact hev;
+      unfold degree; by_contra h; norm_cast at h; rw [Set.ncard_eq_zero] at h; grind
+
+
+
 /-- `T_sqrt * τ` is an eigenfunction of `Laplacian` with eigenvalue `0`. -/
 theorem zero_eigenvalue_normalized (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Adj v v) :
   G.Laplacian.mulVec (G.T_sqrt.mulVec τ) = 0 := by
@@ -267,19 +289,33 @@ theorem zero_eigenvalue_normalized (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Ad
   unfold Laplacian; simp;
   by_cases h_deg : G.degree v = 0
   · simp [h_deg];
-  · push Not at h_deg;
-    simp +decide [Finset.sum_ite, Finset.filter_eq, Finset.filter_ne,
+  · simp +decide [Finset.sum_ite, Finset.filter_eq, Finset.filter_ne,
       Finset.filter_erase, Finset.filter_singleton,
       h_deg, div_eq_mul_inv, mul_comm, mul_left_comm];
-    have hz : ∀ x ∈ {x | G.Adj v x}, (G.degree x) ≠ 0 := sorry
+    have hz : ∀ x ∈ {x | G.Adj v x}, (G.degree x) ≠ 0 := by
+      · intro x hx;
+        exact (adj_degree_neq_zero v x hx).2
+
     field_simp;
     refine Eq.symm (eq_add_neg_of_add_eq ?_); ring_nf;
+    simp_all;
+    push Not at h_deg; push Not at hz;
+    have h1 : ∀ x, G.Adj v x → √↑(G.degree x) * (√↑(G.degree x))⁻¹ = 1 := by
+      intro x hx;
+      refine CommGroupWithZero.mul_inv_cancel √↑(degree x) ?_
+      have h67 : G.degree x ≠ 0 := by grind;
+      simp; tauto;
 
-    -- if adj v x then degree x non nul
-    -- √dᵥ - √dᵥ = 0
+    trans ∑ x with G.Adj v x, (√↑(G.degree v))⁻¹
+    · apply Finset.sum_congr rfl
+      intros x hx
+      rw [h1 x, one_mul]
+      grind
+    · simp; field_simp;
+      rw [← card_of_adj_loopless]
+      · rw [Set.ncard_eq_toFinset_card]; simp;
+      · exact hS
 
-
-    sorry
 
 
 section CompleteGraph

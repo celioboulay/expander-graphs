@@ -45,6 +45,15 @@ For $k \in \mathbb{N}$, a graph is said to be $k$-regular if every vertex $v$ ha
 \end{definition}
 
 
+\begin{definition}
+\lean{WeightedGraph.Volume}
+\label{def:Volume}
+\uses{def:degree}
+\leanok
+The volume of a graph is defined as the sum of the degrees of its vertices.
+\end{definition}
+
+
 
 \begin{definition}
 \lean{WeightedGraph.IsIsolated}
@@ -53,6 +62,7 @@ For $k \in \mathbb{N}$, a graph is said to be $k$-regular if every vertex $v$ ha
 \leanok
 A vertex v is said to be isolated if $d_v = 0$.
 \end{definition}
+
 
 
 \begin{definition}
@@ -116,11 +126,21 @@ Consider the matrix $\mathcal{L}$, defined as follows
 
 
 
+
+\begin{definition}
+\lean{WeightedGraph.T_sqrt}
+\label{def:T_sqrt}
+\leanok
+Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$.
+\end{definition}
+
+
+
 \begin{definition}
 \lean{WeightedGraph.T_inv_sqrt}
 \label{def:T_inv_sqrt}
 \leanok
-Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$. We define its invert square root as $T^{-1/2}$ with the convention that $T^{-1/2} = 0$ for $d_v = 0$.
+We also define $T^{-1/2}$ with the convention that $T^{-1/2} = 0$ when $d_v = 0$.
 \end{definition}
 
 
@@ -174,7 +194,7 @@ where $k > 0$, $A$ is the adjacency matrix of $G$, and $I$ is the identity matri
 \begin{theorem}
 \lean{WeightedGraph.LapOfNotIsolatedGraph}
 \label{thm:LapOfNotIsolatedGraph}
-\uses{def:IsIsolated, thm:LapOfRegGraph}
+\uses{def:IsIsolated}
 \leanok
 For a general graph without isolated vertices, we have
 \[
@@ -202,6 +222,7 @@ the row corresponding to $v$, and has zero entries elsewhere.
 \label{thm:LSS}
 \lean{WeightedGraph.LSS}
 \uses{def:Laplacian, def:S}
+\leanok
 We note that $\mathcal{L}$ can be written as
 \[
 \mathcal{L} = SS^*.
@@ -234,10 +255,28 @@ Following \ref{thm:LapHermitian}, the eigenvalues of $\mathcal{L}$ are all real 
 
 
 
+
 \begin{definition}
-\lean{WeightedGraph.Volume}
-\label{def:Volume}
-\uses{def:degree}
+\lean{WeightedGraph.DirichletSum}
+\label{def:DirichletSum}
 \leanok
-The volume of a graph is defined as the sum of the degrees of its vertices.
+The Dirichlet sum of a graph $G$ for a function $f : \alpha \to \mathbb{R}$ is defined as
+\[
+\sum_{u \sim v}{(f(u)-f(v))^2}.
+\]
 \end{definition}
+
+
+
+
+\begin{definition}
+Let $\tau$ denote the constant function which assigns the value $1$ on each vertex.
+\end{definition}
+
+
+\begin{theorem}
+\lean{WeightedGraph.zero_eigenvalue_normalized}
+\label{thm:zero_eigenvalue_normalized}
+\uses{def:T_sqrt}
+$T^{1/2} * \tau$ is an eigenfunction of $\mathcal{L}$ with eigenvalue $0$.
+\end{theorem}
