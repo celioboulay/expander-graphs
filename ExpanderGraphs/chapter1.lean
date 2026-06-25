@@ -23,7 +23,6 @@ public import Mathlib.Analysis.InnerProductSpace.Rayleigh
 * [Spectral Graph Theory, Fan Chung][Chung]
 -/
 
-set_option linter.style.emptyLine false
 set_option linter.unusedSectionVars false
 set_option linter.unusedFintypeInType false
 set_option linter.unusedDecidableInType false
@@ -246,6 +245,7 @@ def DirichletSum (f : α → ℝ) : ℝ :=
 
 --lemma eigen_rayleigh : G.LapOperator.rayleighQuotient = todo := sorry
 
+
 end Rayleigh
 
 
@@ -264,7 +264,6 @@ lemma card_of_adj_loopless (v : α) (hS : G.IsSimple) :
   exact_mod_cast (hS v).symm
 
 
-
 lemma adj_degree_neq_zero (u v : α) (hAdj : G.Adj u v) :
   G.degree u ≠ 0 ∧ G.degree v ≠ 0 := by
     have hE : ∃ (e : β), G.IsLink e u v := by trivial
@@ -278,42 +277,42 @@ lemma adj_degree_neq_zero (u v : α) (hAdj : G.Adj u v) :
       unfold degree; by_contra h; norm_cast at h; rw [Set.ncard_eq_zero] at h; grind
 
 
-
 /-- `T_sqrt * τ` is an eigenfunction of `Laplacian` with eigenvalue `0`. -/
 theorem zero_eigenvalue_normalized (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Adj v v) :
   G.Laplacian.mulVec (G.T_sqrt.mulVec τ) = 0 := by
   unfold T_sqrt τ;
-  ext v; simp;
-  rw [mulVec, dotProduct]; simp;
-  unfold Laplacian; simp;
+  ext v; simp only [mulVec_mulVec, Pi.zero_apply];
+  rw [mulVec, dotProduct];
+  unfold Laplacian;
   by_cases h_deg : G.degree v = 0
   · simp [h_deg];
   · simp +decide [Finset.sum_ite, Finset.filter_eq, Finset.filter_ne,
       Finset.filter_erase, Finset.filter_singleton,
       h_deg, div_eq_mul_inv, mul_comm, mul_left_comm];
-    have hz : ∀ x ∈ {x | G.Adj v x}, (G.degree x) ≠ 0 := by
-      · intro x hx;
-        exact (adj_degree_neq_zero v x hx).2
-
     field_simp;
+    have hz : ∀ x ∈ {x | G.Adj v x}, (G.degree x) ≠ 0 := by
+      intro x hx; exact (adj_degree_neq_zero v x hx).2;
     refine Eq.symm (eq_add_neg_of_add_eq ?_); ring_nf;
-    simp_all;
-    push Not at h_deg; push Not at hz;
+    simp_all only [Set.mem_setOf_eq, ne_eq, Finset.mem_filter,
+      Finset.mem_univ, and_false, not_false_eq_true, Finset.erase_eq_of_notMem];
     have h1 : ∀ x, G.Adj v x → √↑(G.degree x) * (√↑(G.degree x))⁻¹ = 1 := by
       intro x hx;
       refine CommGroupWithZero.mul_inv_cancel √↑(degree x) ?_
-      have h67 : G.degree x ≠ 0 := by grind;
-      simp; tauto;
-
+      simp [show G.degree x ≠ 0 by grind];
     trans ∑ x with G.Adj v x, (√↑(G.degree v))⁻¹
-    · apply Finset.sum_congr rfl
-      intros x hx
-      rw [h1 x, one_mul]
-      grind
+    · apply Finset.sum_congr rfl; grind;
     · simp; field_simp;
       rw [← card_of_adj_loopless]
       · rw [Set.ncard_eq_toFinset_card]; simp;
       · exact hS
+
+
+
+variable {n : ℕ} (hn : n = Nat.card G.vertexSet)
+variable [Fact (1 < n)] -- (1.2) in book at this point
+
+/-- Second eigenvalue is at most `n / n-1`. -/
+lemma second_eigval_le_div : G.lapEigvals LapHermitian sorry ≤ n / (n-1) := sorry
 
 
 
@@ -352,8 +351,6 @@ end CompleteGraph
 -- ============= Skip to Section 1.3 for now ============= --
 -- 1.3 Basic facts about the spectrum of a graph
 
-variable {n : ℕ} (hn : n = Nat.card G.vertexSet)
-
 include hα hn in
 lemma lapEigvals_sum_eq_trace :
   ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = G.Laplacian.trace := by
@@ -383,6 +380,7 @@ lemma eigval_sum_eq_n_iff_no_isolation (h : G.NoIsolation) :
   simp only [Subtype.forall] at h;
   have hx : ∀ x : α, ¬G.degree x = 0 := by grind;
   simp [hx];
+
 
 
 end Spectral
