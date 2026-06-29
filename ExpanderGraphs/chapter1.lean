@@ -226,8 +226,8 @@ lemma LapHermitian : G.Laplacian.IsHermitian := by
 
 
 /-- Eigenvalues of the Laplacian Matrix in non-increasing order. -/
-def lapEigvals (h : G.Laplacian.IsHermitian) : Fin (Fintype.card α) → ℝ :=
-  Matrix.IsHermitian.eigenvalues₀ h
+def lapEigvals : Fin (Fintype.card α) → ℝ :=
+  fun i => G.LapHermitian.eigenvalues₀ i.rev
 
 
 section Rayleigh
@@ -309,10 +309,11 @@ theorem zero_eigenvalue_normalized (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Ad
 
 
 variable {n : ℕ} (hn : n = Nat.card G.vertexSet)
-variable [Fact (1 < n)] -- (1.2) in book at this point
+variable [Fact (1 < n)] -- required for Eq (1.2) and next results
+
 
 /-- Second eigenvalue is at most `n / n-1`. -/
-lemma second_eigval_le_div : G.lapEigvals LapHermitian sorry ≤ n / (n-1) := sorry
+lemma second_eigval_le_div : G.lapEigvals ⟨1, by sorry⟩ ≤ n / (n-1) := sorry
 
 
 
@@ -353,15 +354,18 @@ end CompleteGraph
 
 include hα hn in
 lemma lapEigvals_sum_eq_trace :
-  ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = G.Laplacian.trace := by
-  rw [G.LapHermitian.trace_eq_sum_eigenvalues,
-    ← Equiv.sum_comp (Fintype.equivOfCardEq (Fintype.card_fin _)).symm]
-  rfl
+  ∑ i : Fin (Fintype.card α), G.lapEigvals i = G.Laplacian.trace := by
+  rw [G.LapHermitian.trace_eq_sum_eigenvalues]
+  unfold lapEigvals
+  refine Fintype.sum_equiv
+    ((⟨Fin.rev, Fin.rev, Fin.rev_rev, Fin.rev_rev⟩ : Equiv.Perm (Fin (Fintype.card α))).trans
+      (Fintype.equivOfCardEq (Fintype.card_fin _))) _ _ (fun i => ?_)
+  simp [Matrix.IsHermitian.eigenvalues]
 
 
 include hα hn in
 /-- For graph `G` on `n` vertices, the sum of its eigenvalues it at most `n`. -/
-lemma eigval_sum_le_n : ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i ≤ n := by
+lemma eigval_sum_le_n : ∑ i : Fin (Fintype.card α), G.lapEigvals i ≤ n := by
   have hn' : (n : ℝ) = Fintype.card α := by rw [hn, hα]; simp
   rw [G.lapEigvals_sum_eq_trace hα hn, hn'];
   unfold trace diag Laplacian;
@@ -372,7 +376,7 @@ lemma eigval_sum_le_n : ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian
 include hα hn in
 /-- The equality in `eigval_sum_le_n` holds iff G has `NoIsolation`. -/
 lemma eigval_sum_eq_n_iff_no_isolation (h : G.NoIsolation) :
-  ∑ i : Fin (Fintype.card α), G.lapEigvals LapHermitian i = n := by
+  ∑ i : Fin (Fintype.card α), G.lapEigvals i = n := by
   have hn' : (n : ℝ) = Fintype.card α := by rw [hn, hα]; simp;
   rw [G.lapEigvals_sum_eq_trace hα hn, hn'];
   unfold trace diag Laplacian;
