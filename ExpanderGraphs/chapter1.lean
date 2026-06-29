@@ -309,12 +309,18 @@ theorem zero_eigenvalue_normalized (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Ad
 
 
 variable {n : ℕ} (hn : n = Nat.card G.vertexSet)
-variable [Fact (1 < n)] -- required for Eq (1.2) and next results
+variable [Fact (1 < n)] -- required for Eq (.2) and next results
+variable [OfNat (Fin (Fintype.card α)) 1]
+
+abbrev hGH := G.LapHermitian
 
 
-/-- Second eigenvalue is at most `n / n-1`. -/
-lemma second_eigval_le_div : G.lapEigvals ⟨1, by sorry⟩ ≤ n / (n-1) := sorry
-
+/-- Helper to access the eigenvalues by non-decreasing order. -/
+lemma eigval_order {i j} : i ≤ j → G.lapEigvals i ≤ G.lapEigvals j := by
+  unfold lapEigvals;
+  intro hrev;
+  have hij : j.rev ≤ i.rev := by simp [hrev];
+  exact IsHermitian.eigenvalues₀_antitone G.LapHermitian hij
 
 
 section CompleteGraph
@@ -385,6 +391,14 @@ lemma eigval_sum_eq_n_iff_no_isolation (h : G.NoIsolation) :
   have hx : ∀ x : α, ¬G.degree x = 0 := by grind;
   simp [hx];
 
+
+include hα hn in
+/-- Second eigenvalue is at most `n / n-1`. -/
+lemma second_eigval_le_div : G.lapEigvals 1 ≤ n / (n-1) := by
+  refine (le_div_iff₀' ?_).mpr ?_
+  · simp [Fact.out];
+  · have h : ∑ i : Fin (Fintype.card α), G.lapEigvals i ≤ n := by exact eigval_sum_le_n
+    sorry
 
 
 end Spectral
