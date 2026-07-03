@@ -1,3 +1,4 @@
 import ExpanderGraphs.Basic
 import ExpanderGraphs.ExpanderMixingLemma
 import ExpanderGraphs.chapter1
+import ExpanderGraphs.chapter2

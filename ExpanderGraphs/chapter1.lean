@@ -388,8 +388,7 @@ lemma eigval_sum_eq_n_iff_no_isolation (h : G.NoIsolation) :
   unfold trace diag Laplacian;
   unfold NoIsolation IsIsolated at h;
   simp only [Subtype.forall] at h;
-  have hx : ∀ x : α, ¬G.degree x = 0 := by grind;
-  simp [hx];
+  simp [show ∀ x : α, ¬G.degree x = 0 by grind];
 
 
 include hα hn in
@@ -397,8 +396,7 @@ include hα hn in
 lemma second_eigval_le_div : G.lapEigvals 1 ≤ n / (n-1) := by
   refine (le_div_iff₀' ?_).mpr ?_
   · simp [Fact.out];
-  · have h : ∑ i : Fin (Fintype.card α), G.lapEigvals i ≤ n := by exact eigval_sum_le_n
-    sorry
+  · sorry
 
 
 end Spectral
