@@ -27,7 +27,6 @@ variable {α β : Type*} [DecidableEq α] [Fintype α] [Fintype β]
 variable {G : WeightedGraph α β} [DecidableRel G.Adj]
 variable (hα : G.vertexSet = Set.univ)
 variable (hβ : G.edgeSet = Set.univ)
-variable {S : Set α} [Fintype S] -- [Fintype Sᶜ]
 
 open Graph
 open NNReal
@@ -60,13 +59,35 @@ lemma self_connection_eq_boundary (S : Set α) :
 
 
 /-- We define vol S, the volume of S, to be the sum of the degrees of the vertices in S. -/
-def vol (S : Set α) [Fintype S] : ℝ≥0 := ∑ v : S, G.degree v
+def vol (G : WeightedGraph α β) (S : Set α) [Fintype S] : ℝ≥0 := ∑ v : S, G.degree v
+-- may move that into chapter 1 though
 
 
--- For a vertex set S, we define hG(S) = |E(S, Sᶜ)| / min(vol S , vol Sᶜ). -/
--- def hG := (edgeBoundary G S).ncard / (min (vol S) (vol Sᶜ))
+open Classical in
+/-- For a vertex set S, we define hG(S) = |E(S, Sᶜ)| / min(vol S , vol Sᶜ). -/
+def hG (G : WeightedGraph α β) (S : Set α) [Fintype S] [Fintype ↑Sᶜ] : ℝ :=
+  (edgeBoundary G S).ncard / (min (vol G S) (vol G Sᶜ))
 
--- We will only consider connected graphs
+
+open Classical in
+/-- The Cheeger constant of a graph G is defined as the
+minimum of hG (s) for every set of vertices s. -/
+def cheeger (G : WeightedGraph α β) : ℝ := ⨅ (S : Set α), hG G S
+
+
+-- TODO: write statements of lemmas
+
+/-- |∂S| ≥ cheger * vol S. -/
+lemma find_name : True := sorry
+
+
+/-- A graph is connected iff its cheeger constant is positive. -/
+lemma connected_iff_cheeger_pos : True := sorry
+
+
+/-- We first derive a simple upper bound for the eigenvalue λ1
+in terms of the Cheeger constant of a connected graph. -/
+lemma two_cheeger_ge_first_eigval : True := sorry
 
 end
 

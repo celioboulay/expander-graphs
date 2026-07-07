@@ -311,3 +311,15 @@ Follows from considering the trace of $\mathcal{L}$.
 \leanok
 In the previous lemma, the equality holds if and only if $G$ has no isolated vertices.
 \end{lemma}
+
+
+
+\begin{lemma}
+\lean{WeightedGraph.second_eigval_le_div}
+\label{lem:second_eigval_le_div}
+\uses{lem:eigval_sum_le_n}
+When $n>1$, we obtain the following upper bound on the second eigenvalue:
+\[
+\lambda_1 \le \frac{n}{n-1}.
+\]
+\end{lemma}
