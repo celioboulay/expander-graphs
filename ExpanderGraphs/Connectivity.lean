@@ -24,7 +24,7 @@ open NNReal
 
 namespace WeightedGraph
 
--- the following definitions are 99% inspired by mathlib SimpleGraph.
+-- the following defs are 99% inspired by mathlib SimpleGraph.
 
 /-- A walk is a sequence of adjacent vertices.  For vertices `u v : α`,
 the type `Walk G u v` consists of all walks starting at `u` and ending at `v`. -/
