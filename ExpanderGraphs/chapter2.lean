@@ -65,24 +65,42 @@ lemma self_connection_eq_boundary (S : Set α) :
 
 open Classical in
 /-- For a vertex set S, we define hG(S) = |E(S, Sᶜ)| / min(vol S , vol Sᶜ). -/
-def hG (G : WeightedGraph α β) (S : Set α) : ℝ :=
+def hG (S : Set α) : ℝ :=
   (G.edgeBoundary S).ncard / (min (G.vol S) (G.vol Sᶜ))
 
 
 open Classical in
 /-- The Cheeger constant of a graph G is defined as the
 minimum of hG (s) for every set of vertices s. -/
-def cheeger (G : WeightedGraph α β) : ℝ := ⨅ (S : Set α), hG G S
+def cheeger (G : WeightedGraph α β) : ℝ :=
+  ⨅ (S : Set α), hG (G := G) S
+
+
+open Classical in
+/-- cheger * vol S ≤ |∂S|. -/
+lemma cheeger_mul_volume_le_volume_frontier (S : Set α) (hPb1 : G.vol S ≤ G.vol Sᶜ) :
+  (cheeger G) * (G.vol S) ≤ (G.edgeBoundary S).ncard := by
+    unfold cheeger hG; norm_cast;
+    have h1 : (⨅ i, ↑(G.edgeBoundary i).ncard / min (G.vol i) (G.vol iᶜ)) * G.vol S ≤
+      ↑(G.edgeBoundary S).ncard / min (G.vol S) (G.vol Sᶜ) * G.vol S := by
+        · by_cases h0 : G.vol S = 0
+          · rw [h0]; simp;
+          · simp_all; push Not at h0; field_simp;
+            have h_min : min (vol S) (vol Sᶜ) = vol S := min_eq_left hPb1
+            have h_pos : 0 < G.vol S := by positivity;
+            rw [← le_div_iff₀ h_pos, ← h_min]
+            apply ciInf_le
+            · use 0; rintro _ ⟨i, rfl⟩; positivity;
+    have h2 :
+      (G.edgeBoundary S).ncard / min (G.vol S) (G.vol Sᶜ) * G.vol S ≤ (G.edgeBoundary S).ncard := by
+        rw [min_eq_left hPb1]; ring_nf;
+        by_cases h0 : G.vol S = 0
+        · rw [h0]; norm_cast; simp;
+        · push Not at h0; refine mul_inv_right_le ?_; norm_cast; simp;
+    grind;
 
 
 -- TODO: write statements of lemmas
-
-/-- |∂S| ≥ cheger * vol S. -/
-lemma cheeger_mul_volume_le_volume_frontier : True := sorry
-
-
-
-
 -- redefine what it means for a graph to be connected for the following statements.
 
 /-- A graph is connected iff its cheeger constant is positive. -/
