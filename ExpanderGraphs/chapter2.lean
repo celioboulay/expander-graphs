@@ -6,8 +6,7 @@ Authors: Celio Boulay, Dylan Sparrow, Rafael Castro
 
 module
 
-public import ExpanderGraphs.chapter1
-
+public import ExpanderGraphs.Connectivity
 
 /-!
 # Isoperimetric problems
@@ -25,8 +24,7 @@ set_option linter.unusedDecidableInType false
 
 variable {α β : Type*} [DecidableEq α] [Fintype α] [Fintype β]
 variable {G : WeightedGraph α β} [DecidableRel G.Adj]
-variable (hα : G.vertexSet = Set.univ)
-variable (hβ : G.edgeSet = Set.univ)
+variable (hα : G.vertexSet = Set.univ) (hβ : G.edgeSet = Set.univ)
 
 open Graph
 open NNReal
@@ -45,6 +43,8 @@ def edgeConnection (A B : Set α) : Set β :=
 
 
 namespace Isoperimetry
+
+/-! ### Isoperimetry and early related results  -/
 
 noncomputable section
 
@@ -101,10 +101,8 @@ lemma cheeger_mul_volume_le_volume_frontier (S : Set α) (hPb1 : G.vol S ≤ G.v
 
 
 -- TODO: write statements of lemmas
--- redefine what it means for a graph to be connected for the following statements.
-
 /-- A graph is connected iff its cheeger constant is positive. -/
-lemma connected_iff_cheeger_pos : True := sorry
+lemma connected_iff_cheeger_pos : G.Connected ↔ 0 < cheeger G := sorry
 
 
 /-- We first derive a simple upper bound for the eigenvalue λ1
@@ -114,3 +112,5 @@ lemma two_cheeger_ge_first_eigval : True := sorry
 end
 
 end Isoperimetry
+
+end WeightedGraph
