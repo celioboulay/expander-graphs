@@ -46,8 +46,8 @@ For $k \in \mathbb{N}$, a graph is said to be $k$-regular if every vertex $v$ ha
 
 
 \begin{definition}
-\lean{WeightedGraph.Volume}
-\label{def:Volume}
+\lean{WeightedGraph.graphVolume}
+\label{def:graphVolume}
 \uses{def:degree}
 \leanok
 The volume of a graph is defined as the sum of the degrees of its vertices.
@@ -277,7 +277,7 @@ Let $\tau$ denote the constant function which assigns the value $1$ on each vert
 \begin{theorem}
 \lean{WeightedGraph.zero_eigenvalue_normalized}
 \label{thm:zero_eigenvalue_normalized}
-\uses{def:T_sqrt}
+\uses{def:T_sqrt, def:Laplacian}
 \leanok
 $T^{1/2} * \tau$ is an eigenfunction of $\mathcal{L}$ with eigenvalue $0$.
 \end{theorem}
@@ -323,3 +323,8 @@ When $n>1$, we obtain the following upper bound on the second eigenvalue:
 \lambda_1 \le \frac{n}{n-1}.
 \]
 \end{lemma}
+
+
+
+\chapter{Isoperimetric problems}
+

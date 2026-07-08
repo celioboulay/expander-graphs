@@ -59,7 +59,11 @@ def IsRegularOfDegree (k : ℕ) := ∀ v, G.degree v = k
 
 
 /-- The volume of a graph is defined as the sum of the degrees of its vertices -/
-def Volume : ℝ≥0 := ∑ v : α, G.degree v
+def graphVolume : ℝ≥0 := ∑ v : α, G.degree v
+
+
+/-- We define vol S, the volume of S, to be the sum of the degrees of the vertices in S. -/
+def vol (S : Set α) [Fintype S] : ℝ≥0 := ∑ v : S, G.degree v
 
 
 /-- We say v is an isolated vertex if dᵥ = 0. -/
@@ -402,5 +406,10 @@ lemma second_eigval_le_div : G.lapEigvals 1 ≤ n / (n-1) := by
 end Spectral
 
 end
+
+-- Connectivity
+
+
+
 
 end WeightedGraph

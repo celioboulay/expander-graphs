@@ -58,15 +58,10 @@ lemma self_connection_eq_boundary (S : Set α) :
   edgeBoundary G S = edgeConnection G S Sᶜ := rfl
 
 
-/-- We define vol S, the volume of S, to be the sum of the degrees of the vertices in S. -/
-def vol (G : WeightedGraph α β) (S : Set α) [Fintype S] : ℝ≥0 := ∑ v : S, G.degree v
--- may move that into chapter 1 though
-
-
 open Classical in
 /-- For a vertex set S, we define hG(S) = |E(S, Sᶜ)| / min(vol S , vol Sᶜ). -/
-def hG (G : WeightedGraph α β) (S : Set α) [Fintype S] [Fintype ↑Sᶜ] : ℝ :=
-  (edgeBoundary G S).ncard / (min (vol G S) (vol G Sᶜ))
+def hG (G : WeightedGraph α β) (S : Set α) : ℝ :=
+  (edgeBoundary G S).ncard / (min (G.vol S) (G.vol Sᶜ))
 
 
 open Classical in
@@ -79,6 +74,9 @@ def cheeger (G : WeightedGraph α β) : ℝ := ⨅ (S : Set α), hG G S
 
 /-- |∂S| ≥ cheger * vol S. -/
 lemma find_name : True := sorry
+
+
+-- redefine what it means for a graph to be connected.
 
 
 /-- A graph is connected iff its cheeger constant is positive. -/
