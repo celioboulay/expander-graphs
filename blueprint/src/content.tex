@@ -326,5 +326,150 @@ When $n>1$, we obtain the following upper bound on the second eigenvalue:
 
 
 
+
+\chapter{Connectivity of general graph}
+
+\begin{definition}[Walk]
+\label{def:Walk}
+\lean{WeightedGraph.Walk}
+\leanok
+A walk is a sequence of adjacent vertices. For vertices $u, v \in V$, the walk between them is a sequence starting at $u$ and ending at $v$.
+\end{definition}
+
+\begin{definition}[Reachable]
+\label{def:Reachable}
+\lean{WeightedGraph.Reachable}
+\uses{def:Walk}
+\leanok
+Two vertices $u$ and $v$ are said to be reachable if there is a walk between them.
+\end{definition}
+
+\begin{definition}[Preconnected]
+\label{def:Preconnected}
+\lean{WeightedGraph.Preconnected}
+\uses{def:Reachable}
+\leanok
+A graph is preconnected if every pair of vertices is reachable from one another.
+\end{definition}
+
+\begin{definition}[Connected]
+\label{def:Connected}
+\lean{WeightedGraph.Connected}
+\uses{def:Preconnected}
+\leanok
+A graph is connected if it is preconnected and contains at least one vertex.
+\end{definition}
+
+\begin{definition}[Edge Boundary]
+\label{def:edgeBoundary}
+\lean{WeightedGraph.edgeBoundary}
+\leanok
+For a subset of vertices $S \subseteq V$, the edge boundary $\partial S$ consists of all edges with exactly one endpoint in $S$ and the other in $S^c$.
+\end{definition}
+
+\begin{lemma}
+\label{lem:walk_crossing}
+\lean{WeightedGraph.walk_crossing}
+\uses{def:Walk, def:edgeBoundary}
+If there is a walk going from a vertex $u \in S$ to a vertex $v \in S^c$, then there is at least one edge that goes from $S$ to $S^c$.
+\end{lemma}
+
+\begin{lemma}
+\label{lem:connected_non_empty_edge_boundary}
+\lean{WeightedGraph.connected_non_empty_edge_boundary}
+\uses{def:Connected, def:edgeBoundary}
+\leanok
+In a connected graph, every set of vertices $S$ different from the empty set and the universal set ($S \neq \emptyset$ and $S \neq V$) has a non-empty edge boundary, that is $\partial S \neq \emptyset$.
+\end{lemma}
+
+
+
+
+
+
+
+
 \chapter{Isoperimetric problems}
 
+
+\begin{definition}[Edge Connection]
+\label{def:edgeConnection}
+\lean{WeightedGraph.edgeConnection}
+\leanok
+For two sets of vertices $A$ and $B$, $E(A, B)$ denotes the set of edges with one endpoint in $A$ and one endpoint in $B$.
+\end{definition}
+
+\begin{lemma}
+\label{lem:edgeBoundaryComplement}
+\lean{WeightedGraph.Isoperimetry.edgeBoundaryComplement}
+\uses{def:edgeBoundary}
+\leanok
+For any set of vertices $S$, the edge boundary of $S$ is equal to the edge boundary of its complement:
+$$
+\partial S = \partial S^c.
+$$
+\end{lemma}
+
+\begin{lemma}
+\label{lem:self_connection_eq_boundary}
+\lean{WeightedGraph.Isoperimetry.self_connection_eq_boundary}
+\uses{def:edgeBoundary, def:edgeConnection}
+\leanok
+The edge boundary of a set $S$ is equal to the edge connection between $S$ and $S^c$:
+$$
+\partial S = E(S, S^c).
+$$
+\end{lemma}
+
+\begin{definition}
+\label{def:hG}
+\lean{WeightedGraph.Isoperimetry.hG}
+\uses{def:edgeBoundary, def:graphVolume}
+\leanok
+For a vertex set $S$, we define $h_G(S)$ as the ratio of the size of its edge boundary to the minimum volume of $S$ and its complement:
+$$
+h_G(S) = \frac{|E(S, S^c)|}{\min(\operatorname{vol}(S), \operatorname{vol}(S^c))}.
+$$
+\end{definition}
+
+\begin{definition}[Cheeger Constant]
+\label{def:cheeger}
+\lean{WeightedGraph.Isoperimetry.cheeger}
+\uses{def:hG}
+\leanok
+The Cheeger constant of a graph $G$, denoted $h_G$, is defined as the minimum of $h_G(S)$ for every set of vertices $S$ with non-zero volume and co-volume:
+$$
+h_G = \inf_{\substack{S \subset V \\ 0 < \min(\operatorname{vol}(S), \operatorname{vol}(S^c))}} h_G(S).
+$$
+\end{definition}
+
+\begin{lemma}
+\label{lem:cheeger_mul_volume_le_volume_frontier}
+\lean{WeightedGraph.Isoperimetry.cheeger_mul_volume_le_volume_frontier}
+\uses{def:cheeger, def:edgeBoundary}
+\leanok
+For any set of vertices $S$ satisfying $\operatorname{vol}(S) \le \operatorname{vol}(S^c)$ and $0 < \min(\operatorname{vol}(S), \operatorname{vol}(S^c))$, we have:
+$$
+h_G \cdot \operatorname{vol}(S) \le |\partial S|.
+$$
+\end{lemma}
+
+\begin{lemma}
+\label{lem:connected_iff_cheeger_pos}
+\lean{WeightedGraph.Isoperimetry.connected_iff_cheeger_pos}
+\uses{def:Connected, def:cheeger}
+A graph $G$ is connected if and only if its Cheeger constant is strictly positive:
+$$
+G \text{ is connected} \iff 0 < h_G.
+$$
+\end{lemma}
+
+\begin{lemma}
+\label{lem:two_cheeger_ge_first_eigval}
+\lean{WeightedGraph.Isoperimetry.two_cheeger_ge_first_eigval}
+\uses{def:cheeger}
+We derive a simple upper bound for the first non-trivial eigenvalue $\lambda_1$ in terms of the Cheeger constant of a connected graph:
+$$
+\lambda_1 \le 2 h_G.
+$$
+\end{lemma}

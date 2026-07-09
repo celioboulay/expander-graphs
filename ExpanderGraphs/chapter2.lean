@@ -32,11 +32,6 @@ open NNReal
 
 namespace WeightedGraph
 
-/-- We define the edge boundary ∂S of S to consist of all edges with exactly one endpoint in S. -/
-def edgeBoundary (S : Set α) : Set β :=
-  {e ∈ G.edgeSet | ∃ a ∈ S, ∃ b ∈ Sᶜ, G.IsLink e a b}
-
-
 /-- E(A, B) denotes the set of edges with one endpoint in A and one endpoint in B. -/
 def edgeConnection (A B : Set α) : Set β :=
   {e ∈ G.edgeSet | ∃ a ∈ A, ∃ b ∈ B, G.IsLink e a b}

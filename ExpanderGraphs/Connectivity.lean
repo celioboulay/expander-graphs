@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Celio Boulay. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Celio Boulay.
+Authors: Celio Boulay
 -/
 
 module
@@ -11,6 +11,10 @@ public import ExpanderGraphs.chapter1
 /-!
 # Connectivity for general graphs
 -/
+
+set_option linter.unusedSectionVars false
+set_option linter.unusedFintypeInType false
+set_option linter.unusedDecidableInType false
 
 @[expose] public section
 
@@ -44,6 +48,43 @@ def Preconnected : Prop := ∀ u v : α, G.Reachable u v
 structure Connected : Prop where
   protected preconnected : G.Preconnected
   protected [nonempty : Nonempty α]
+
+
+/-- We define the edge boundary ∂S of S to consist of all edges with exactly one endpoint in S. -/
+def edgeBoundary (S : Set α) : Set β :=
+  {e ∈ G.edgeSet | ∃ a ∈ S, ∃ b ∈ Sᶜ, G.IsLink e a b}
+
+
+/-- If there is a walk going from S to Sᶜ then there is a least on edge that
+goes from S to Sᶜ. -/
+lemma walk_crossing (u v : α) (S : Set α) -- probably a terrible name lol
+  (hu : u ∈ S) (hv : v ∉ S) (hW : G.Walk u v) :
+    ∃ e : β, G.IsLink e u v := sorry
+
+
+include hβ in
+/-- In a connected graph, every set of vertices, different from ∅ and univ,
+has non empty edgeBoundary: ∂S ≠ ∅. -/
+lemma connected_non_empty_edge_boundary (h : G.Connected) (S : Set α)
+  (hS_nonempty : S.Nonempty) (hS_ne_univ : S ≠ Set.univ) :
+  Nonempty (G.edgeBoundary S) := by
+
+  rcases hS_nonempty with ⟨u, hu⟩
+  obtain ⟨v, hv⟩ : ∃ v, v ∉ S := by grind;
+  have h_path := h.preconnected u v
+
+  unfold edgeBoundary;
+
+  rw [Reachable] at h_path;
+  rcases h_path with ⟨p⟩
+  clear hS_ne_univ h;
+
+  have hE : ∃ e : β, G.IsLink e u v := sorry
+  obtain ⟨e, he⟩ := hE;
+  use e;
+  refine ⟨?_, ?_⟩
+  · grind
+  · exact ⟨u, hu, v, hv, he⟩
 
 
 end WeightedGraph
