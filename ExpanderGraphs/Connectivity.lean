@@ -55,11 +55,25 @@ def edgeBoundary (S : Set α) : Set β :=
   {e ∈ G.edgeSet | ∃ a ∈ S, ∃ b ∈ Sᶜ, G.IsLink e a b}
 
 
-/-- If there is a walk going from S to Sᶜ then there is a least on edge that
-goes from S to Sᶜ. -/
-lemma walk_crossing (u v : α) (S : Set α) -- probably a terrible name lol
-  (hu : u ∈ S) (hv : v ∉ S) (hW : G.Walk u v) :
-    ∃ e : β, G.IsLink e u v := sorry
+include hβ in
+/-- If there is a walk going from S to Sᶜ then
+there is a least on edge that goes from S to Sᶜ. -/
+lemma walk_crossing (S : Set α) {u v : α} (hW : G.Walk u v) :
+    u ∈ S → v ∉ S → ∃ e, e ∈ G.edgeBoundary S := by
+  induction hW with
+  | nil =>
+    intro hu hv
+    exact (hv hu).elim
+  | cons h p ih =>
+      rename_i x y z
+      intro hx hz
+      by_cases hy : y ∈ S
+      · exact ih hy hz
+      · rw [Adj] at h
+        unfold edgeBoundary
+        simp
+        obtain ⟨e, he⟩ := h
+        grind
 
 
 include hβ in
@@ -68,23 +82,13 @@ has non empty edgeBoundary: ∂S ≠ ∅. -/
 lemma connected_non_empty_edge_boundary (h : G.Connected) (S : Set α)
   (hS_nonempty : S.Nonempty) (hS_ne_univ : S ≠ Set.univ) :
   Nonempty (G.edgeBoundary S) := by
-
   rcases hS_nonempty with ⟨u, hu⟩
   obtain ⟨v, hv⟩ : ∃ v, v ∉ S := by grind;
   have h_path := h.preconnected u v
-
-  unfold edgeBoundary;
-
   rw [Reachable] at h_path;
   rcases h_path with ⟨p⟩
-  clear hS_ne_univ h;
-
-  have hE : ∃ e : β, G.IsLink e u v := sorry
-  obtain ⟨e, he⟩ := hE;
-  use e;
-  refine ⟨?_, ?_⟩
-  · grind
-  · exact ⟨u, hu, v, hv, he⟩
+  simp only [nonempty_subtype];
+  exact walk_crossing hβ S p hu hv
 
 
 end WeightedGraph
