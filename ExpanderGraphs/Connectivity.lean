@@ -55,6 +55,12 @@ def edgeBoundary (S : Set α) : Set β :=
   {e ∈ G.edgeSet | ∃ a ∈ S, ∃ b ∈ Sᶜ, G.IsLink e a b}
 
 
+/-- We can define the vertex boundary δS of S to be the set of
+all vertices v not in S but adjacent to some vertex in S. -/
+def vertexBoundary (S : Set α) : Set α :=
+  {v ∉ S | ∃ u : S, ∃ e : G.edgeSet, G.IsLink e u v}
+
+
 include hβ in
 /-- If there is a walk going from S to Sᶜ then
 there is a least on edge that goes from S to Sᶜ. -/

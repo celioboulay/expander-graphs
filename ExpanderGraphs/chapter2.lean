@@ -65,10 +65,23 @@ def hG (S : Set α) : ℝ :=
 
 
 open Classical in
+/-- For a vertex set S, we define its vertex expansion as gG(S) = |vol δS| / min(vol S , vol Sᶜ). -/
+def gG (S : Set α) : ℝ :=
+  G.vol (G.vertexBoundary S) / (min (G.vol S) (G.vol Sᶜ))
+
+
+open Classical in
 /-- The Cheeger constant of a graph G is defined as the
-minimum of hG (s) for every set of vertices s with non-zero volume and co-volume. -/
+minimum of hG (S) for every set of vertices S with non-zero volume and co-volume. -/
 def cheeger (G : WeightedGraph α β) : ℝ :=
   ⨅ (S : Set α) (_ : 0 < min (G.vol S) (G.vol Sᶜ)), hG (G := G) S
+
+
+open Classical in
+/-- The Vertex Cheeger constant of a graph G is defined as the minimum of
+gG (S) for every set of vertices S with non-zero volume and co-volume. -/
+def cheegerV (G : WeightedGraph α β) : ℝ :=
+  ⨅ (S : Set α) (_ : 0 < min (G.vol S) (G.vol Sᶜ)), gG (G := G) S
 
 
 open Classical in
@@ -99,11 +112,37 @@ lemma cheeger_mul_volume_le_volume_frontier (S : Set α)
 
 -- TODO: write statements of lemmas
 /-- A graph is connected iff its cheeger constant is positive. -/
-lemma connected_iff_cheeger_pos : G.Connected ↔ 0 < cheeger G := sorry
+lemma connected_iff_cheeger_pos : G.Connected ↔ 0 < cheeger G := by
+  sorry
+
 
 /-- We first derive a simple upper bound for the eigenvalue λ1
-in terms of the Cheeger constant of a connected graph. -/
+in terms of the Cheeger constant of a connected graph. -/ -- (LEMMA 2.1)
 lemma two_cheeger_ge_first_eigval : True := sorry
+
+
+/-- For a connected graph G, λ₁ > hG²/2. -/
+theorem cheeger_lower_bound : True := sorry
+-- theorem 2.3 gives an improved bound
+
+
+lemma hG_le_gG (S : Set α) : hG (G := G) S ≤ gG (G := G) S := by
+  unfold hG gG;
+  norm_cast;
+  by_cases h : min (G.vol S) (G.vol Sᶜ) = 0
+  · rw [h]; simp
+  · push Not at h;
+    refine div_le_div_of_nonneg_right ?_ ?_
+    · sorry
+    · positivity;
+
+
+lemma cheeger_le_cheegerV : cheeger G ≤ cheegerV G := by
+  unfold cheeger cheegerV
+  gcongr with S hS
+  · simp;
+  · use 0; rintro y ⟨h, rfl⟩; unfold hG; positivity
+  · exact hG_le_gG S;
 
 end
 
