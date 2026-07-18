@@ -147,9 +147,51 @@ def IsSimple : Prop := ∀ u, (G.degree u : ℝ) = ({v | G.Adj u v}).ncard
 
 
 /-- The Laplacian Operator satisfies *big equation page 3*. -/
-lemma LapOperatorFormula (hS : G.IsSimple) : ⇑G.LapOperator =
+lemma LapOperatorFormula (hS : G.IsSimple) (hLoopless : ∀ v : α, ¬ G.Adj v v) : ⇑G.LapOperator =
   fun g u => (1 / √ (G.degree u)) * ∑ v : α, if G.Adj u v then
-      g u / √ (G.degree u) - g v / √ (G.degree v) else 0 := sorry
+      g u / √ (G.degree u) - g v / √ (G.degree v) else 0 := by
+      funext g u
+      simp only [LapOperator,LinearMap.coe_toContinuousLinearMap', Matrix.toLin'_apply]
+      rw [Matrix.mulVec, dotProduct]
+      unfold Laplacian
+      by_cases hu : G.degree u = 0
+      · simp [hu]
+      · simp only [Finset.mul_sum, mul_ite, mul_zero, mul_sub, div_mul_div_comm, one_mul]
+        rw [Real.mul_self_sqrt (NNReal.coe_nonneg _)]
+        rw [← Finset.sum_filter, Finset.sum_sub_distrib]
+        rw [Finset.sum_const, nsmul_eq_mul]
+        have hcard : (({a : α | G.Adj u a} : Finset α).card : ℝ) = (G.degree u : ℝ) := by
+          rw [hS]
+          norm_cast
+          rw [Set.ncard_eq_toFinset_card]
+          simp
+        rw [hcard, mul_div_cancel₀ _ (coe_ne_zero.mpr hu)]
+        simp only [ite_mul, zero_mul, one_mul]
+        rw [Finset.sum_ite]
+        have hfilter1 : ({x : α | u = x} : Finset α) = {u} := by
+          ext x
+          simp [eq_comm]
+        rw [hfilter1]
+        simp only [Finset.sum_singleton, if_neg hu]
+        simp only [Real.sqrt_mul (NNReal.coe_nonneg _)]
+        rw [← Finset.sum_filter]
+        simp_rw [div_mul_eq_mul_div, neg_one_mul, neg_div, Finset.sum_neg_distrib, ← sub_eq_add_neg]
+        have hfilter2 : (({x : α | u ≠ x} : Finset α).filter (fun x => G.Adj u x)) =
+        ({x : α | G.Adj u x} : Finset α) := by
+          apply Finset.Subset.antisymm
+          · intro x hx
+            simp [(Finset.mem_filter.mp hx).2]
+          · intro x hx
+            apply Finset.mem_filter.mpr
+            have hAdj := (Finset.mem_filter.mp hx).2
+            constructor
+            · simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+              intro hux
+              apply hLoopless u
+              nth_rw 2 [hux]
+              exact hAdj
+            · exact hAdj
+        · rw [hfilter2]; simp[mul_comm]
 
 
 /-- Adjacency Matrix: `A(u, v) = 1` if `u` is adjacent to `v`, and `0` otherwise. -/
