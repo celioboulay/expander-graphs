@@ -369,37 +369,6 @@ lemma eigval_order {i j} : i ≤ j → G.lapEigvals i ≤ G.lapEigvals j := by
   exact IsHermitian.eigenvalues₀_antitone G.LapHermitian hij
 
 
-section CompleteGraph
-
-/-- Complete Graph `Kₙ` on `n` vertices. -/
-structure CompleteGraph (α β : Type*) extends WeightedGraph α β where
-  completeness : ∀ (x y : α), x ≠ y ↔ ∃ e : edgeSet, IsLink e x y
-
-
-variable {K : CompleteGraph α β}
-
--- add subsequent lemmas such as loopless et. al. (for Complete Graph)
--- may use G.loopSet x in the following
-lemma complete_graph_loopless : ∀ v, ¬ K.Adj v v := by
-  by_contra h; push Not at h;
-  obtain ⟨v, hv⟩ := h
-  -- have h_iff := K.completeness v v;
-  sorry
-
-
-/-- `0` is an eigenvalue of the Laplacian of a graph. -/
-theorem zero_mem_spectrum_lapMatrix (K : CompleteGraph α β) [DecidableRel K.Adj] :
-    0 ∈ lapSpectrum K.toWeightedGraph := sorry
-
-
-/-- For the complete graph `Kₙ` on `n` vertices, the eigenvalues
-are `0` and `n/(n − 1)` (with multiplicity `n − 1`). -/
-lemma zero_mem_complete_graph_spectrum (K : CompleteGraph α β) [DecidableRel K.Adj] :
-    0 ∈ lapSpectrum K.toWeightedGraph := sorry
-
-
-end CompleteGraph
-
 
 -- ============= Skip to Section 1.3 for now ============= --
 -- 1.3 Basic facts about the spectrum of a graph
