@@ -356,7 +356,7 @@ theorem zero_eigenvalue_normalized (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Ad
 
 variable {n : ℕ} (hn : n = Nat.card G.vertexSet)
 variable [Fact (1 < n)] -- required for Eq (.2) and next results
-variable [OfNat (Fin (Fintype.card α)) 1]
+variable [OfNat (Fin (Fintype.card α)) 1] [OfNat (Fin (Fintype.card α)) 0]
 
 abbrev hGH := G.LapHermitian
 
@@ -435,6 +435,42 @@ lemma eigval_sum_eq_n_iff_no_isolation (h : G.NoIsolation) :
   unfold NoIsolation IsIsolated at h;
   simp only [Subtype.forall] at h;
   simp [show ∀ x : α, ¬G.degree x = 0 by grind];
+
+
+/-- When the graph is non empty, 0 is an eigenvalue of the `Laplacian`. -/
+lemma zero_mem_lapSpectrum [Nonempty α] (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Adj v v) :
+  (0 : ℝ) ∈ G.lapSpectrum := by
+  unfold lapSpectrum spectrum resolventSet
+  rw [Set.mem_compl_iff, Set.mem_setOf_eq]
+  simp only [map_zero, zero_sub]
+  intro h_unit_neg
+  have h_unit_L : IsUnit G.Laplacian := by
+    have h_eq : G.Laplacian = - (- G.Laplacian) := by simp;
+    rw [h_eq]; exact h_unit_neg.neg
+  have h_ker := zero_eigenvalue_normalized hS hLoopless
+  have h_sqrt_zero : G.T_sqrt.mulVec τ = 0 := by
+    rcases h_unit_L.exists_left_inv with ⟨B, hB⟩
+    have h1 : B.mulVec (G.Laplacian.mulVec (G.T_sqrt.mulVec τ)) = B.mulVec 0 := by
+      rw [h_ker]
+    rw [mulVec_zero, mulVec_mulVec, hB, one_mulVec] at h1;
+    exact h1
+  have h_deg_zero : ∀ v, G.degree v = 0 := by
+    intro v
+    have h_eval := congr_fun h_sqrt_zero v
+    simp [T_sqrt, τ, Matrix.mulVec] at h_eval; grind;
+  have h_lap_zero : G.Laplacian = 0 := by
+    ext u v
+    unfold Laplacian
+    have hdv := h_deg_zero v
+    split_ifs <;> simp_all
+  rw [h_lap_zero] at h_unit_L
+  exact not_isUnit_zero h_unit_L
+
+
+include hα hn in
+/-- λ₀ = 0. -/
+lemma first_eigval_eq_0 : G.lapEigvals 0 = 0 := by
+  sorry
 
 
 include hα hn in

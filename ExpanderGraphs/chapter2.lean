@@ -144,6 +144,9 @@ lemma cheeger_le_cheegerV : cheeger G ≤ cheegerV G := by
   · use 0; rintro y ⟨h, rfl⟩; unfold hG; positivity
   · exact hG_le_gG S;
 
+
+lemma two_cheegerV_ge_first_eigval : True := sorry -- using cheeger_le_cheegerV
+
 end
 
 end Isoperimetry

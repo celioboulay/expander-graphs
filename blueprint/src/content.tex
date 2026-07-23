@@ -169,6 +169,7 @@ The Laplacian of a graph can be viewed as an operator on the space of functions 
 \lean{WeightedGraph.LapOperatorFormula}
 \label{def:LapOpFormula}
 \uses{def:LapOperator}
+\leanok
 The Laplacian Operator satisfies
 \[
 \mathcal{L}g(u) = \frac{1}{\sqrt{d_u}} \sum_{\substack{v \\ u \sim v}} \left( \frac{g(u)}{\sqrt{d_u}} - \frac{g(v)}{\sqrt{d_v}} \right).
@@ -222,7 +223,6 @@ the row corresponding to $v$, and has zero entries elsewhere.
 \label{lem:LSS}
 \lean{WeightedGraph.LSS}
 \uses{def:Laplacian, def:S}
-\leanok
 We note that $\mathcal{L}$ can be written as
 \[
 \mathcal{L} = SS^*.
@@ -275,14 +275,12 @@ Let $\tau$ denote the constant function which assigns the value $1$ on each vert
 
 
 \begin{theorem}
-\lean{WeightedGraph.zero_eigenvalue_normalized}
-\label{thm:zero_eigenvalue_normalized}
+\lean{WeightedGraph.zero_mem_lapSpectrum}
+\label{thm:zero_mem_lapSpectrum}
 \uses{def:T_sqrt, def:Laplacian}
 \leanok
 $T^{1/2} * \tau$ is an eigenfunction of $\mathcal{L}$ with eigenvalue $0$.
 \end{theorem}
-
-
 
 
 \section{Basic facts about the spectrum of a graph}
