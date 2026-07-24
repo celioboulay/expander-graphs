@@ -7,8 +7,8 @@ We omit natural language proofs for theorems that only involve matrix multiplica
 \section{Weighted Graph}
 
 \begin{definition}[Weighted Graph]
-\label{def:WeightedGraph}
-\lean{WeightedGraph}
+\label{def:UnweightedGraph}
+\lean{UnweightedGraph}
 \leanok
 We extend the definition of a general graph to that of a weighted graph by defining a weight function over its edges.
 
@@ -29,7 +29,7 @@ We also add an arbitray orientation for undirected edges.
 
 \begin{definition}
 \label{def:degree}    
-\lean{WeightedGraph.degree}
+\lean{UnweightedGraph.degree}
 \leanok
 In a graph G, let $d_v$ denote the degree (number of incident edges) of vertex $v$.
 \end{definition}
@@ -37,7 +37,7 @@ In a graph G, let $d_v$ denote the degree (number of incident edges) of vertex $
 
 
 \begin{definition}
-\lean{WeightedGraph.IsRegularOfDegree}
+\lean{UnweightedGraph.IsRegularOfDegree}
 \uses{def:degree}
 \label{def:IsRegularOfDegree}
 \leanok
@@ -46,7 +46,7 @@ For $k \in \mathbb{N}$, a graph is said to be $k$-regular if every vertex $v$ ha
 
 
 \begin{definition}
-\lean{WeightedGraph.graphVolume}
+\lean{UnweightedGraph.graphVolume}
 \label{def:graphVolume}
 \uses{def:degree}
 \leanok
@@ -56,7 +56,7 @@ The volume of a graph is defined as the sum of the degrees of its vertices.
 
 
 \begin{definition}
-\lean{WeightedGraph.IsIsolated}
+\lean{UnweightedGraph.IsIsolated}
 \label{def:IsIsolated}
 \uses{def:degree}
 \leanok
@@ -66,7 +66,7 @@ A vertex v is said to be isolated if $d_v = 0$.
 
 
 \begin{definition}
-\lean{WeightedGraph.NonTrivial}
+\lean{UnweightedGraph.NonTrivial}
 \label{def:NonTrivial}
 \leanok
 A graph is said to be nontrivial if it contains at least one edge.
@@ -77,7 +77,7 @@ A graph is said to be nontrivial if it contains at least one edge.
 \section{Matrices and Operators}
 
 \begin{definition}
-\lean{WeightedGraph.Adjacency}
+\lean{UnweightedGraph.Adjacency}
 \label{def:Adjacency}
 \leanok
 The adjacency matrix of a graph $G$, denoted $A$ is defined as follows,
@@ -92,7 +92,7 @@ A(u,v)=
 
 
 \begin{definition}
-\lean{WeightedGraph.L}
+\lean{UnweightedGraph.L}
 \label{def:L}
 \leanok
 Consider the matrix L, defined as follows
@@ -109,7 +109,7 @@ L(u,v)=
 
 
 \begin{definition} [Laplacian Matrix]
-\lean{WeightedGraph.Laplacian}
+\lean{UnweightedGraph.Laplacian}
 \label{def:Laplacian}
 \leanok
 Consider the matrix $\mathcal{L}$, defined as follows
@@ -128,7 +128,7 @@ Consider the matrix $\mathcal{L}$, defined as follows
 
 
 \begin{definition}
-\lean{WeightedGraph.T_sqrt}
+\lean{UnweightedGraph.T_sqrt}
 \label{def:T_sqrt}
 \leanok
 Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$.
@@ -137,7 +137,7 @@ Let $T$ denote the diagonal matrix with the $(u,v)$-th entry having value $d_v$.
 
 
 \begin{definition}
-\lean{WeightedGraph.T_inv_sqrt}
+\lean{UnweightedGraph.T_inv_sqrt}
 \label{def:T_inv_sqrt}
 \leanok
 We also define $T^{-1/2}$ with the convention that $T^{-1/2} = 0$ when $d_v = 0$.
@@ -146,7 +146,7 @@ We also define $T^{-1/2}$ with the convention that $T^{-1/2} = 0$ when $d_v = 0$
 
 
 \begin{lemma} [Laplacian symmetric normalization]
-\lean{WeightedGraph.Lap_symmetric_normalization}
+\lean{UnweightedGraph.Lap_symmetric_normalization}
 \label{lem:Lap_symmetric_normalization}
 \uses{def:T_inv_sqrt, def:Laplacian, def:L}
 \leanok
@@ -158,7 +158,7 @@ We also define $T^{-1/2}$ with the convention that $T^{-1/2} = 0$ when $d_v = 0$
 
 
 \begin{definition}
-\lean{WeightedGraph.LapOperator}
+\lean{UnweightedGraph.LapOperator}
 \label{def:LapOperator}
 \leanok
 The Laplacian of a graph can be viewed as an operator on the space of functions $g : V(G) \rightarrow \mathbb{R}$.
@@ -166,7 +166,7 @@ The Laplacian of a graph can be viewed as an operator on the space of functions 
 
 
 \begin{definition}
-\lean{WeightedGraph.LapOperatorFormula}
+\lean{UnweightedGraph.LapOperatorFormula}
 \label{def:LapOpFormula}
 \uses{def:LapOperator}
 \leanok
@@ -179,7 +179,7 @@ The Laplacian Operator satisfies
 
 
 \begin{lemma}
-\lean{WeightedGraph.LapOfRegGraph}
+\lean{UnweightedGraph.LapOfRegGraph}
 \label{lem:LapOfRegGraph}
 \uses{def:Laplacian, def:Adjacency, def:IsRegularOfDegree}
 \leanok
@@ -193,7 +193,7 @@ where $k > 0$, $A$ is the adjacency matrix of $G$, and $I$ is the identity matri
 
 
 \begin{lemma}
-\lean{WeightedGraph.LapOfNotIsolatedGraph}
+\lean{UnweightedGraph.LapOfNotIsolatedGraph}
 \label{lem:LapOfNotIsolatedGraph}
 \uses{def:IsIsolated}
 \leanok
@@ -207,7 +207,7 @@ For a general graph without isolated vertices, we have
 
 
 \begin{definition}[Boundary Operator]
-\lean{WeightedGraph.S}
+\lean{UnweightedGraph.S}
 \label{def:S}
 \uses{def:degree}
 \leanok
@@ -221,7 +221,7 @@ the row corresponding to $v$, and has zero entries elsewhere.
 
 \begin{lemma}
 \label{lem:LSS}
-\lean{WeightedGraph.LSS}
+\lean{UnweightedGraph.LSS}
 \uses{def:Laplacian, def:S}
 We note that $\mathcal{L}$ can be written as
 \[
@@ -232,7 +232,7 @@ We note that $\mathcal{L}$ can be written as
 
 
 \begin{lemma}
-\lean{WeightedGraph.LapHermitian}
+\lean{UnweightedGraph.LapHermitian}
 \label{lem:LapHermitian}
 \uses{def:Laplacian}
 \leanok
@@ -246,7 +246,7 @@ By spectral theorem.
 
 
 \begin{definition}
-\lean{WeightedGraph.lapEigvals}
+\lean{UnweightedGraph.lapEigvals}
 \label{def:lapEigvals}
 \uses{lem:LapHermitian}
 \leanok
@@ -257,7 +257,7 @@ Following \ref{lem:LapHermitian}, the eigenvalues of $\mathcal{L}$ are all real 
 
 
 \begin{definition}
-\lean{WeightedGraph.DirichletSum}
+\lean{UnweightedGraph.DirichletSum}
 \label{def:DirichletSum}
 \leanok
 The Dirichlet sum of a graph $G$ for a function $f : \alpha \to \mathbb{R}$ is defined as
@@ -275,7 +275,7 @@ Let $\tau$ denote the constant function which assigns the value $1$ on each vert
 
 
 \begin{theorem}
-\lean{WeightedGraph.zero_mem_lapSpectrum}
+\lean{UnweightedGraph.zero_mem_lapSpectrum}
 \label{thm:zero_mem_lapSpectrum}
 \uses{def:T_sqrt, def:Laplacian}
 \leanok
@@ -286,7 +286,7 @@ $T^{1/2} * \tau$ is an eigenfunction of $\mathcal{L}$ with eigenvalue $0$.
 \section{Basic facts about the spectrum of a graph}
 
 \begin{lemma}
-\lean{WeightedGraph.eigval_sum_le_n}
+\lean{UnweightedGraph.eigval_sum_le_n}
 \label{lem:eigval_sum_le_n}
 \uses{def:lapEigvals}
 \leanok
@@ -303,7 +303,7 @@ Follows from considering the trace of $\mathcal{L}$.
 
 
 \begin{lemma}
-\lean{WeightedGraph.eigval_sum_eq_n_iff_no_isolation}
+\lean{UnweightedGraph.eigval_sum_eq_n_iff_no_isolation}
 \label{lem:eigval_sum_eq_n_iff_no_isolation}
 \uses{def:lapEigvals}
 \leanok
@@ -313,7 +313,7 @@ In the previous lemma, the equality holds if and only if $G$ has no isolated ver
 
 
 \begin{lemma}
-\lean{WeightedGraph.second_eigval_le_div}
+\lean{UnweightedGraph.second_eigval_le_div}
 \label{lem:second_eigval_le_div}
 \uses{lem:eigval_sum_le_n}
 When $n>1$, we obtain the following upper bound on the second eigenvalue:
@@ -329,14 +329,14 @@ When $n>1$, we obtain the following upper bound on the second eigenvalue:
 
 \begin{definition}[Walk]
 \label{def:Walk}
-\lean{WeightedGraph.Walk}
+\lean{UnweightedGraph.Walk}
 \leanok
 A walk is a sequence of adjacent vertices. For vertices $u, v \in V$, the walk between them is a sequence starting at $u$ and ending at $v$.
 \end{definition}
 
 \begin{definition}[Reachable]
 \label{def:Reachable}
-\lean{WeightedGraph.Reachable}
+\lean{UnweightedGraph.Reachable}
 \uses{def:Walk}
 \leanok
 Two vertices $u$ and $v$ are said to be reachable if there is a walk between them.
@@ -344,7 +344,7 @@ Two vertices $u$ and $v$ are said to be reachable if there is a walk between the
 
 \begin{definition}[Preconnected]
 \label{def:Preconnected}
-\lean{WeightedGraph.Preconnected}
+\lean{UnweightedGraph.Preconnected}
 \uses{def:Reachable}
 \leanok
 A graph is preconnected if every pair of vertices is reachable from one another.
@@ -352,7 +352,7 @@ A graph is preconnected if every pair of vertices is reachable from one another.
 
 \begin{definition}[Connected]
 \label{def:Connected}
-\lean{WeightedGraph.Connected}
+\lean{UnweightedGraph.Connected}
 \uses{def:Preconnected}
 \leanok
 A graph is connected if it is preconnected and contains at least one vertex.
@@ -360,28 +360,25 @@ A graph is connected if it is preconnected and contains at least one vertex.
 
 \begin{definition}[Edge Boundary]
 \label{def:edgeBoundary}
-\lean{WeightedGraph.edgeBoundary}
+\lean{UnweightedGraph.edgeBoundary}
 \leanok
 For a subset of vertices $S \subseteq V$, the edge boundary $\partial S$ consists of all edges with exactly one endpoint in $S$ and the other in $S^c$.
 \end{definition}
 
 \begin{lemma}
 \label{lem:walk_crossing}
-\lean{WeightedGraph.walk_crossing}
+\lean{UnweightedGraph.walk_crossing}
 \uses{def:Walk, def:edgeBoundary}
 If there is a walk going from a vertex $u \in S$ to a vertex $v \in S^c$, then there is at least one edge that goes from $S$ to $S^c$.
 \end{lemma}
 
 \begin{lemma}
 \label{lem:connected_non_empty_edge_boundary}
-\lean{WeightedGraph.connected_non_empty_edge_boundary}
+\lean{UnweightedGraph.connected_non_empty_edge_boundary}
 \uses{def:Connected, def:edgeBoundary}
 \leanok
 In a connected graph, every set of vertices $S$ different from the empty set and the universal set ($S \neq \emptyset$ and $S \neq V$) has a non-empty edge boundary, that is $\partial S \neq \emptyset$.
 \end{lemma}
-
-
-
 
 
 
@@ -392,14 +389,14 @@ In a connected graph, every set of vertices $S$ different from the empty set and
 
 \begin{definition}[Edge Connection]
 \label{def:edgeConnection}
-\lean{WeightedGraph.edgeConnection}
+\lean{UnweightedGraph.edgeConnection}
 \leanok
 For two sets of vertices $A$ and $B$, $E(A, B)$ denotes the set of edges with one endpoint in $A$ and one endpoint in $B$.
 \end{definition}
 
 \begin{lemma}
 \label{lem:edgeBoundaryComplement}
-\lean{WeightedGraph.Isoperimetry.edgeBoundaryComplement}
+\lean{UnweightedGraph.Isoperimetry.edgeBoundaryComplement}
 \uses{def:edgeBoundary}
 \leanok
 For any set of vertices $S$, the edge boundary of $S$ is equal to the edge boundary of its complement:
@@ -410,7 +407,7 @@ $$
 
 \begin{lemma}
 \label{lem:self_connection_eq_boundary}
-\lean{WeightedGraph.Isoperimetry.self_connection_eq_boundary}
+\lean{UnweightedGraph.Isoperimetry.self_connection_eq_boundary}
 \uses{def:edgeBoundary, def:edgeConnection}
 \leanok
 The edge boundary of a set $S$ is equal to the edge connection between $S$ and $S^c$:
@@ -421,7 +418,7 @@ $$
 
 \begin{definition}
 \label{def:hG}
-\lean{WeightedGraph.Isoperimetry.hG}
+\lean{UnweightedGraph.Isoperimetry.hG}
 \uses{def:edgeBoundary, def:graphVolume}
 \leanok
 For a vertex set $S$, we define $h_G(S)$ as the ratio of the size of its edge boundary to the minimum volume of $S$ and its complement:
@@ -432,7 +429,7 @@ $$
 
 \begin{definition}[Cheeger Constant]
 \label{def:cheeger}
-\lean{WeightedGraph.Isoperimetry.cheeger}
+\lean{UnweightedGraph.Isoperimetry.cheeger}
 \uses{def:hG}
 \leanok
 The Cheeger constant of a graph $G$, denoted $h_G$, is defined as the minimum of $h_G(S)$ for every set of vertices $S$ with non-zero volume and co-volume:
@@ -443,7 +440,7 @@ $$
 
 \begin{lemma}
 \label{lem:cheeger_mul_volume_le_volume_frontier}
-\lean{WeightedGraph.Isoperimetry.cheeger_mul_volume_le_volume_frontier}
+\lean{UnweightedGraph.Isoperimetry.cheeger_mul_volume_le_volume_frontier}
 \uses{def:cheeger, def:edgeBoundary}
 \leanok
 For any set of vertices $S$ satisfying $\operatorname{vol}(S) \le \operatorname{vol}(S^c)$ and $0 < \min(\operatorname{vol}(S), \operatorname{vol}(S^c))$, we have:
@@ -454,7 +451,7 @@ $$
 
 \begin{lemma}
 \label{lem:connected_iff_cheeger_pos}
-\lean{WeightedGraph.Isoperimetry.connected_iff_cheeger_pos}
+\lean{UnweightedGraph.Isoperimetry.connected_iff_cheeger_pos}
 \uses{def:Connected, def:cheeger}
 A graph $G$ is connected if and only if its Cheeger constant is strictly positive:
 $$
@@ -464,7 +461,7 @@ $$
 
 \begin{lemma}
 \label{lem:two_cheeger_ge_first_eigval}
-\lean{WeightedGraph.Isoperimetry.two_cheeger_ge_first_eigval}
+\lean{UnweightedGraph.Isoperimetry.two_cheeger_ge_first_eigval}
 \uses{def:cheeger}
 We derive a simple upper bound for the first non-trivial eigenvalue $\lambda_1$ in terms of the Cheeger constant of a connected graph:
 $$

@@ -7,6 +7,8 @@ module
 
 public import Mathlib.Data.NNReal.Defs
 public import Mathlib.Combinatorics.Graph.Basic
+public import Mathlib.LinearAlgebra.Matrix.Symmetric
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 
 /-!
@@ -25,14 +27,32 @@ This file develops the basic theory of weighted graphs.
 @[expose] public section
 
 variable {α β : Type*} {x y z u v : α} {e f : β}
+variable [Fintype α] [DecidableEq α]
 
 open Set
 
 open NNReal
 
-structure WeightFunction (α : Type*) where
+structure WeightedGraph (α β : Type*) extends Graph α β where
   w : α → α → ℝ≥0
   symm : ∀ u v, w u v = w v u
+  edgeCondition : ∀ u v, ¬ toGraph.Adj u v → w u v = 0
 
-structure WeightedGraph (α β : Type*) extends Graph α β where
-  edgeWeight : WeightFunction α
+variable (G : WeightedGraph α β) [DecidableRel G.Adj]
+
+namespace WeightedGraph
+
+def degree (v : α) : ℝ≥0 := ∑ u : α, G.w u v
+
+def vol : ℝ≥0 := ∑ u : α, G.degree u
+
+open Matrix
+
+def L : Matrix G.vertexSet G.vertexSet ℝ :=
+  fun (u v : G.vertexSet) =>
+    if u = v then G.degree v - G.w u v
+    else if G.Adj u v then - G.w u v
+    else 0
+
+
+end WeightedGraph

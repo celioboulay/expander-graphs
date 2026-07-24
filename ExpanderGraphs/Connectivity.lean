@@ -20,13 +20,13 @@ set_option linter.unusedDecidableInType false
 
 
 variable {α β : Type*} [DecidableEq α] [Fintype α] [Fintype β]
-variable {G : WeightedGraph α β} [DecidableRel G.Adj]
+variable {G : UnweightedGraph α β} [DecidableRel G.Adj]
 variable (hα : G.vertexSet = Set.univ) (hβ : G.edgeSet = Set.univ)
 
 open Graph
 open NNReal
 
-namespace WeightedGraph
+namespace UnweightedGraph
 
 -- the following defs are 99% inspired by mathlib SimpleGraph.
 
@@ -97,4 +97,4 @@ lemma connected_non_empty_edge_boundary (h : G.Connected) (S : Set α)
   exact walk_crossing hβ S p hu hv
 
 
-end WeightedGraph
+end UnweightedGraph

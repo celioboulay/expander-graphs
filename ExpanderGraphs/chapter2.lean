@@ -23,14 +23,14 @@ set_option linter.unusedDecidableInType false
 
 
 variable {α β : Type*} [DecidableEq α] [Fintype α] [Fintype β]
-variable {G : WeightedGraph α β} [DecidableRel G.Adj]
+variable {G : UnweightedGraph α β} [DecidableRel G.Adj]
 variable (hα : G.vertexSet = Set.univ) (hβ : G.edgeSet = Set.univ)
 
 open Graph
 open NNReal
 
 
-namespace WeightedGraph
+namespace UnweightedGraph
 
 /-- E(A, B) denotes the set of edges with one endpoint in A and one endpoint in B. -/
 def edgeConnection (A B : Set α) : Set β :=
@@ -73,14 +73,14 @@ def gG (S : Set α) : ℝ :=
 open Classical in
 /-- The Cheeger constant of a graph G is defined as the
 minimum of hG (S) for every set of vertices S with non-zero volume and co-volume. -/
-def cheeger (G : WeightedGraph α β) : ℝ :=
+def cheeger (G : UnweightedGraph α β) : ℝ :=
   ⨅ (S : Set α) (_ : 0 < min (G.vol S) (G.vol Sᶜ)), hG (G := G) S
 
 
 open Classical in
 /-- The Vertex Cheeger constant of a graph G is defined as the minimum of
 gG (S) for every set of vertices S with non-zero volume and co-volume. -/
-def cheegerV (G : WeightedGraph α β) : ℝ :=
+def cheegerV (G : UnweightedGraph α β) : ℝ :=
   ⨅ (S : Set α) (_ : 0 < min (G.vol S) (G.vol Sᶜ)), gG (G := G) S
 
 
@@ -151,4 +151,4 @@ end
 
 end Isoperimetry
 
-end WeightedGraph
+end UnweightedGraph

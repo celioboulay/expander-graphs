@@ -33,19 +33,17 @@ set_option linter.unusedDecidableInType false
 open NNReal
 
 
-structure WeightedGraph (α β : Type*) extends Graph α β where
-  edgeWeight : β → ℝ≥0
-  edgeDef (e : β) : e ∈ edgeSet ↔ 0 < edgeWeight e
+structure UnweightedGraph (α β : Type*) extends Graph α β where
   orientation : β → α
 
 variable {α β : Type*} [DecidableEq α] [Fintype α] [Fintype β]
-variable {G : WeightedGraph α β}
+variable {G : UnweightedGraph α β}
 variable [DecidableRel G.Adj]
 variable (hα : G.vertexSet = Set.univ)
 variable (hβ : G.edgeSet = Set.univ)
 
 
-namespace WeightedGraph
+namespace UnweightedGraph
 
 noncomputable section
 
@@ -296,7 +294,7 @@ end Rayleigh
 
 
 /-- The spectrum of a graph -/
-def lapSpectrum (G : WeightedGraph α β) [DecidableRel G.Adj] : Set ℝ :=
+def lapSpectrum (G : UnweightedGraph α β) [DecidableRel G.Adj] : Set ℝ :=
   spectrum ℝ G.Laplacian
 
 
@@ -459,4 +457,4 @@ end
 
 
 
-end WeightedGraph
+end UnweightedGraph
