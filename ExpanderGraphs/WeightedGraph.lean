@@ -14,10 +14,12 @@ public import Mathlib.Combinatorics.Graph.Basic
 This file develops the basic theory of weighted graphs `WeightedGraph α β`.
 
 ## Main definitions
+
 - `WeightedGraph` is a finite `Graph` associated with a weight function.
 - `degreeMatrix` and `lapMatrix`: matrices associated with a graph.
 
 ## References
+
 * [Spectral Graph Theory, Fan Chung][Chung]
 -/
 
@@ -45,16 +47,13 @@ def degree (v : α) : ℝ := ∑ u : α, G.w u v
 
 omit [Fintype α] [DecidableEq α] [DecidableRel G.Adj] in
 lemma no_adj_of_notMem_vertexSet (v : α) (h : v ∉ G.vertexSet) : ∀ u, ¬ G.Adj u v := by
-  intro u
-  rw [Graph.Adj]
-  grind
+  simp [Graph.Adj]
+  grind only [→ Graph.IsLink.right_mem];
 
 omit [DecidableEq α] [DecidableRel G.Adj] in
 lemma degree_zero_of_notMem_vertexSet (v : α) (h : v ∉ G.vertexSet) : G.degree v = 0 := by
-  unfold degree;
-  have h_adj : ∀ u, ¬ G.Adj u v := by exact no_adj_of_notMem_vertexSet G v h
-  have h_w0 : ∀ u, G.w u v = 0 := by exact fun u ↦ G.edgeCondition u v (h_adj u)
-  exact Fintype.sum_eq_zero (fun a ↦ G.w a v) h_w0
+  exact Fintype.sum_eq_zero (fun a ↦ G.w a v)
+    (fun u ↦ G.edgeCondition u v (no_adj_of_notMem_vertexSet G v h u))
 
 /-- The volume of a graph `G` is the sum of the degree in `G` of each u ∈ α. -/
 def vol : ℝ := ∑ u : α, G.degree u
