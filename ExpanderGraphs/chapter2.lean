@@ -116,9 +116,11 @@ lemma connected_iff_cheeger_pos : G.Connected ↔ 0 < cheeger G := by
   sorry
 
 
-/-- We first derive a simple upper bound for the eigenvalue λ1
+variable [OfNat (Fin (Fintype.card α)) 0] [OfNat (Fin (Fintype.card α)) 1]
+/-- We first derive a simple upper bound for the eigenvalue λ₁
 in terms of the Cheeger constant of a connected graph. -/ -- (LEMMA 2.1)
-lemma two_cheeger_ge_first_eigval : True := sorry
+lemma two_cheeger_ge_eigval_1 :
+   G.lapEigvals 1 ≤ 2 * cheeger G := sorry
 
 
 /-- For a connected graph G, λ₁ > hG²/2. -/

@@ -1,4 +1,5 @@
 import ExpanderGraphs.Connectivity
+import ExpanderGraphs.Expander
 import ExpanderGraphs.WeightedGraph
 import ExpanderGraphs.chapter1
 import ExpanderGraphs.chapter2

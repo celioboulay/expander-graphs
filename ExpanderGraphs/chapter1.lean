@@ -286,8 +286,12 @@ def DirichletSum (f : α → ℝ) : ℝ :=
   ∑ u : α, ∑ v : α, if G.Adj u v then (f u - f v)^2 else 0
 
 
-
---lemma eigen_rayleigh : G.LapOperator.rayleighQuotient = todo := sorry
+/-- Quotient de Rayleigh pour la première valeur propre non nulle du laplacien normalisé. -/
+lemma lapEigvals_one_eq_inf_rayleigh [Nonempty α] (hS : G.IsSimple) (hLoopless : ∀ v, ¬ G.Adj v v) :
+    G.lapEigvals 1 =
+    ⨅ (f : α → ℝ) (_ : ∑ v : α, f v * (G.degree v : ℝ) = 0) (_ : f ≠ 0),
+      ((1 / 2) * G.DirichletSum f) / (∑ v : α, (f v)^2 * (G.degree v : ℝ)) := by
+  sorry
 
 
 end Rayleigh
