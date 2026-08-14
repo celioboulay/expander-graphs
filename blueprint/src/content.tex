@@ -384,6 +384,9 @@ In a connected graph, every set of vertices $S$ different from the empty set and
 
 
 
+
+
+
 \chapter{Isoperimetric problems}
 
 
@@ -460,11 +463,126 @@ $$
 \end{lemma}
 
 \begin{lemma}
-\label{lem:two_cheeger_ge_first_eigval}
-\lean{UnweightedGraph.Isoperimetry.two_cheeger_ge_first_eigval}
+\label{lem:two_cheegerV_ge_first_eigval}
+\lean{UnweightedGraph.Isoperimetry.two_cheegerV_ge_first_eigval}
 \uses{def:cheeger}
 We derive a simple upper bound for the first non-trivial eigenvalue $\lambda_1$ in terms of the Cheeger constant of a connected graph:
 $$
 \lambda_1 \le 2 h_G.
 $$
 \end{lemma}
+
+\chapter{Expander graphs and the mixing lemma}
+
+This chapter follows Swastik Kopparty, \emph{Lecture 2: Expander Graphs, Mixing lemma and
+Applications to randomness}, Topics in Pseudo-randomness and Complexity Theory (Spring 2018),
+Rutgers University; scribed by Danny Scheinerman and Harsha Tirumala.
+
+Throughout, $G$ is a $d$-regular simple graph on $n$ vertices.
+
+\begin{definition}[Normalized adjacency matrix]
+\label{def:norm_adj_matrix}
+\lean{norm_adj_matrix}
+\leanok
+The normalized adjacency matrix of $G$ is $M = \frac{1}{d} A$, where $A$ is the adjacency matrix.
+Since $G$ is $d$-regular, $M$ is the transition matrix of the simple random walk on $G$.
+\end{definition}
+
+\begin{lemma}
+\label{lem:norm_adj_matrix_isHermitian}
+\lean{norm_adj_matrix_isHermitian}
+\uses{def:norm_adj_matrix}
+\leanok
+$M$ is symmetric, hence Hermitian, so the spectral theorem provides an orthonormal basis of
+eigenvectors $v_1, \dots, v_n$ with real eigenvalues $\lambda_1, \dots, \lambda_n$.
+\end{lemma}
+
+\begin{lemma}
+\label{lem:norm_adj_matrix_mulVec_const}
+\lean{norm_adj_matrix_mulVec_const}
+\uses{def:norm_adj_matrix}
+\leanok
+Every constant function is an eigenvector of $M$ with eigenvalue $1$: each vertex has exactly
+$d$ neighbours, so averaging a constant over them returns the same constant.
+\end{lemma}
+
+\begin{theorem}
+\label{thm:eq_const_of_mulVec_eq}
+\lean{eq_const_of_mulVec_eq}
+\uses{def:norm_adj_matrix, def:Connected}
+\leanok
+Let $G$ be connected and $d$-regular. Then every eigenvector of $M$ with eigenvalue $1$ is
+constant.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $f$ satisfy $Mf = f$ and let $m = f(v_0)$ be the maximum value of $f$, attained at some
+vertex $v_0$ since $V$ is finite and nonempty. Because $G$ is $d$-regular,
+$$ f(v_0) = (Mf)(v_0) = \frac{1}{d} \sum_{u \sim v_0} f(u), $$
+so $\sum_{u \sim v_0} (m - f(u)) = d\,m - d\,f(v_0) = 0$. Each summand is nonnegative, hence every
+summand vanishes and $f(u) = m$ for every neighbour $u$ of $v_0$. Propagating this along a walk,
+which exists between any two vertices since $G$ is connected, gives $f \equiv m$.
+\end{proof}
+
+\begin{lemma}
+\label{lem:eigval_eq_one_unique}
+\lean{eigval_eq_one_unique}
+\uses{thm:eq_const_of_mulVec_eq}
+\leanok
+On a connected $d$-regular graph the eigenvalue $1$ is simple: two distinct basis indices cannot
+both carry the eigenvalue $1$, since their eigenvectors would both be nonzero constants and so
+could not be orthogonal.
+\end{lemma}
+
+\begin{definition}[Expander]
+\label{def:expander}
+\lean{expander}
+\uses{def:norm_adj_matrix}
+\leanok
+$G$ is a $\gamma$-expander when every eigenvalue of $M$ other than the top eigenvalue $1$ is at
+most $\gamma$ in absolute value. By \ref{lem:eigval_eq_one_unique} this excludes exactly one
+eigenvalue when $G$ is connected.
+\end{definition}
+
+\begin{definition}
+\label{def:e_AB}
+\lean{e_AB}
+\leanok
+For vertex sets $A, B \subseteq V$, $e(A, B) = |\{(a,b) \in E(G) \;:\; a \in A, b \in B\}|$ is the
+number of edges joining a vertex in $A$ to a vertex in $B$.
+\end{definition}
+
+\begin{theorem}[Expander mixing lemma]
+\label{thm:expander_mixing_lemma}
+\lean{expander_mixing_lemma}
+\uses{def:expander, def:e_AB, lem:eigval_eq_one_unique}
+\leanok
+Let $G$ be a connected $d$-regular $\gamma$-expander on $n$ vertices and let $A, B \subseteq V$ be
+two sets of vertices (possibly overlapping). Then
+$$ \left| e(A,B) - \frac{d}{n} |A| |B| \right| \le \gamma\, d \sqrt{|A| |B|}. $$
+Note that the estimate $e(A,B) \approx \frac{d}{n}|A||B|$ is what one would expect for a random
+$d$-regular graph on $n$ vertices.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:norm_adj_matrix_isHermitian, lem:norm_adj_matrix_mulVec_const}
+Let $\mathbf{1}_A, \mathbf{1}_B : V \to \mathbf{R}$ be the indicator functions of $A$ and $B$, and
+write their expansions in the orthonormal eigenbasis as $\alpha_i = \langle v_i, \mathbf{1}_A
+\rangle$ and $\beta_i = \langle v_i, \mathbf{1}_B \rangle$. Since $G$ is $d$-regular,
+$$ e(A,B) = \sum_{i,j} \mathbf{1}_A(i) \mathbf{1}_B(j) A_{ij}
+          = d \left\langle \mathbf{1}_A, M \mathbf{1}_B \right\rangle
+          = d \sum_i \lambda_i \alpha_i \beta_i . $$
+Let $i_0$ be the index carrying the eigenvalue $1$, which is unique by
+\ref{lem:eigval_eq_one_unique}; its eigenvector is a constant $c$ with $n c^2 = 1$. Hence
+$\alpha_{i_0} = c |A|$ and $\beta_{i_0} = c |B|$, so the $i_0$ term contributes
+$$ d\,\lambda_{i_0} \alpha_{i_0} \beta_{i_0} = d\,c^2 |A| |B| = \frac{d}{n} |A| |B|, $$
+which is exactly the main term. For the remaining terms, $|\lambda_i| \le \gamma$ and
+Cauchy-Schwarz followed by Parseval give
+$$ \left| \sum_{i \ne i_0} \lambda_i \alpha_i \beta_i \right|
+   \le \gamma \sum_{i \ne i_0} |\alpha_i| |\beta_i|
+   \le \gamma \Big( \sum_i \alpha_i^2 \Big)^{1/2} \Big( \sum_i \beta_i^2 \Big)^{1/2}
+   = \gamma \sqrt{|A|}\sqrt{|B|} . $$
+Multiplying by $d$ gives the claim.
+\end{proof}
