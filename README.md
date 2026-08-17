@@ -7,6 +7,13 @@ Goal is to formalize Expander Graphs and related Spectral Graph Theory results. 
 
 You need [elan](https://github.com/leanprover/elan) installed.
 
+## References
+The primary reference for this project is:
+
+- Daniel Spielman *Spectral and Algebraic Graph Theory*.
+
+Unless stated otherwise, definitions and statements follow the conventions of that book.
+
 ## Building
 ```sh
 git clone https://github.com/celioboulay/expander-graphs.git
