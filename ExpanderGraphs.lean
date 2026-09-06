@@ -1,3 +1,4 @@
+import ExpanderGraphs.Coloring
 import ExpanderGraphs.Connectivity
 import ExpanderGraphs.EML
 import ExpanderGraphs.WeightedGraph
